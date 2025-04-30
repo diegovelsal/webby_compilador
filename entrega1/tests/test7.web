@@ -1,0 +1,7 @@
+program funcProgram;
+void myFunction(int param) : var: int temp;
+{
+  temp = param + 1;
+}
+main {
+} end

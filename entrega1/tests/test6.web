@@ -1,0 +1,7 @@
+program loopProgram;
+var: int counter;
+main {
+  while (counter < 10) do {
+    counter = counter + 1;
+  }
+} end

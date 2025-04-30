@@ -1,0 +1,56 @@
+# UNO
+program myProgram;
+main {
+} end
+
+# DOS
+program testVars;
+var: int x, y, z;
+main {
+} end
+
+# TRES
+program printProgram;
+var: float pi;
+main {
+  print(pi);
+} end
+
+# CUATRO
+program mathProgram;
+var: int a, b;
+main {
+  a = 5;
+  b = a + 10 * (a - 3);
+} end
+
+# CINCO
+program mathProgram;
+var: int a, b;
+main {
+  a = 5;
+  b = a + 10 * (a - 3);
+} end
+
+# SEIS
+program loopProgram;
+var: int counter;
+main {
+  while (counter < 10) do {
+    counter = counter + 1;
+  }
+} end
+
+# SIETE
+program funcProgram;
+void myFunction(int param) : var: int temp;
+{
+  temp = param + 1;
+}
+main {
+} end
+
+# OCHO
+program errorProgram
+main {
+} end
