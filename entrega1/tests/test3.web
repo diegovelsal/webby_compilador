@@ -1,5 +1,0 @@
-program printProgram;
-var: float pi;
-main {
-  print(pi);
-} end

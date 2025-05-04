@@ -1,0 +1,7 @@
+program ejemplo;
+var x: float;
+main
+{
+    x = 5;
+}
+end

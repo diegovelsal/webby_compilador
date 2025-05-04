@@ -1,0 +1,5 @@
+program printTest;
+main {
+  print("El resultado es:", a + b, 42, "fin");
+}
+end

@@ -1,6 +1,0 @@
-program mathProgram;
-var: int a, b;
-main {
-  a = 5;
-  b = a + 10 * (a - 3);
-} end

@@ -1,0 +1,13 @@
+program fcallTest;
+
+void show(x: int) [
+  {
+    print(x);
+  }
+];
+
+main {
+  show(5);
+  show(a + b);
+}
+end

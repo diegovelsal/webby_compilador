@@ -1,4 +1,0 @@
-program testVars;
-var: int x, y, z;
-main {
-} end

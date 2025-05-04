@@ -1,0 +1,9 @@
+program ejemplo;
+main
+{
+    if ()
+    {
+        print("Condicion verdadera");
+    }
+}
+end
