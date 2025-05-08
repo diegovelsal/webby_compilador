@@ -1,5 +1,4 @@
 package lex_par;
-
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
@@ -8,7 +7,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Objects;
 
-public class WebbyTest {
+import sem.DirFunc;
+
+public class LexParTest {
     public static void main(String[] args) throws IOException {
         File testsFolder = new File("tests");
 

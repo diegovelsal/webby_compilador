@@ -1,7 +1,7 @@
 program ejemplo;
 main
 {
-    if ()
+    if (x < 5)
     {
         print("Condicion verdadera");
     }

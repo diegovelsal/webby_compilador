@@ -1,5 +1,5 @@
 program ejemplo;
-var x: float;
+var x, x: float;
 main
 {
     x = 5;

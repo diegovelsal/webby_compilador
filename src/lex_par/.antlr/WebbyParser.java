@@ -1,5 +1,4 @@
-// Generated from src/lex_par/WebbyParser.g4 by ANTLR 4.13.2
-package lex_par;
+// Generated from c:/Users/diego/OneDrive/Escritorio/Tec/8toSemestre/Compilador/RetoCompilador/src/lex_par/WebbyParser.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -9,9 +8,9 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue", "this-escape"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class WebbyParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.13.2", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.13.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -128,19 +127,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_programa; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterPrograma(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitPrograma(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitPrograma(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ProgramaContext programa() throws RecognitionException {
@@ -208,19 +194,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_vars; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterVars(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitVars(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitVars(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final VarsContext vars() throws RecognitionException {
@@ -273,19 +246,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_var_decl; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterVar_decl(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitVar_decl(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitVar_decl(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Var_declContext var_decl() throws RecognitionException {
@@ -329,19 +289,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_id_list; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterId_list(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitId_list(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitId_list(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Id_listContext id_list() throws RecognitionException {
@@ -390,19 +337,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_type; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterType(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitType(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitType(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final TypeContext type() throws RecognitionException {
@@ -459,19 +393,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_params; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterParams(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitParams(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitParams(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ParamsContext params() throws RecognitionException {
@@ -532,19 +453,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_funcs_list; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterFuncs_list(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitFuncs_list(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitFuncs_list(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Funcs_listContext funcs_list() throws RecognitionException {
@@ -603,19 +511,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_funcs; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterFuncs(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitFuncs(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitFuncs(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final FuncsContext funcs() throws RecognitionException {
@@ -688,19 +583,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_body; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterBody(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitBody(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitBody(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final BodyContext body() throws RecognitionException {
@@ -762,19 +644,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final StatementContext statement() throws RecognitionException {
@@ -844,19 +713,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_assign; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterAssign(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitAssign(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitAssign(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final AssignContext assign() throws RecognitionException {
@@ -899,19 +755,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_print; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterPrint(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitPrint(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitPrint(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final PrintContext print() throws RecognitionException {
@@ -959,19 +802,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_print_args; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterPrint_args(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitPrint_args(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitPrint_args(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Print_argsContext print_args() throws RecognitionException {
@@ -1022,19 +852,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_print_arg; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterPrint_arg(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitPrint_arg(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitPrint_arg(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final Print_argContext print_arg() throws RecognitionException {
@@ -1098,19 +915,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_condition; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterCondition(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitCondition(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitCondition(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ConditionContext condition() throws RecognitionException {
@@ -1165,19 +969,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_cycle; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterCycle(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitCycle(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitCycle(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final CycleContext cycle() throws RecognitionException {
@@ -1237,19 +1028,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expresion; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterExpresion(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitExpresion(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitExpresion(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ExpresionContext expresion() throws RecognitionException {
@@ -1318,19 +1096,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_exp; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterExp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitExp(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitExp(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ExpContext exp() throws RecognitionException {
@@ -1399,19 +1164,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_termino; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterTermino(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitTermino(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitTermino(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final TerminoContext termino() throws RecognitionException {
@@ -1477,19 +1229,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_factor; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterFactor(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitFactor(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitFactor(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final FactorContext factor() throws RecognitionException {
@@ -1567,19 +1306,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_cte; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterCte(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitCte(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitCte(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final CteContext cte() throws RecognitionException {
@@ -1625,19 +1351,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_f_call; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterF_call(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitF_call(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitF_call(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final F_callContext f_call() throws RecognitionException {
@@ -1694,19 +1407,6 @@ public class WebbyParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_args; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).enterArgs(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WebbyParserListener ) ((WebbyParserListener)listener).exitArgs(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof WebbyParserVisitor ) return ((WebbyParserVisitor<? extends T>)visitor).visitArgs(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ArgsContext args() throws RecognitionException {
