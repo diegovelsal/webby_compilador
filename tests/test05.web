@@ -1,9 +1,0 @@
-program conditionTest;
-main {
-  if (a < b) {
-    print("menor");
-  } else {
-    print("mayor o igual");
-  };
-}
-end

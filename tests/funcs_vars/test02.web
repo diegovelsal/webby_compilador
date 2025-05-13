@@ -1,0 +1,9 @@
+program varDuplicada;
+
+var
+    a : int;
+    a : float;
+
+main {
+}
+end

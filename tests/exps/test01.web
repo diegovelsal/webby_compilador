@@ -1,0 +1,12 @@
+program asignacionCompleja;
+var 
+  a, b, c, d, resultado: int;
+
+main {
+  a = 5;
+  b = 10;
+  c = 2;
+  d = 3;
+  resultado = a + b * c - d / (a - 1);
+}
+end

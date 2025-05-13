@@ -1,7 +1,0 @@
-program ejemplo;
-var x: boolean;
-main
-{
-    print(x);
-}
-end

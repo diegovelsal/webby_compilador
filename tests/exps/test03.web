@@ -1,0 +1,16 @@
+program ifComplejo;
+var 
+  m, n, p: int;
+
+main {
+  m = 6;
+  n = 3;
+  p = 10;
+
+  if ((m * n + 4) > (p - n / 2)) {
+    print(m + n + p);
+  } else {
+    print("No cumple");
+  };
+}
+end

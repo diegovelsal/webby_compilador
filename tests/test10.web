@@ -1,7 +1,0 @@
-program ejemplo;
-var x, x: float;
-main
-{
-    x = 5;
-}
-end

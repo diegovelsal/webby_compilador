@@ -1,25 +1,27 @@
 
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import lex_par.WebbyLexer;
 import lex_par.WebbyParser;
+import sem.funcs_vars.DirFunc;
+import sem.SemanticVisitor;
+import sem.exps.Quadruple;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Objects;
 
-import sem.SemanticVisitor;
-import sem.DirFunc;
-
 public class Test {
     public static void main(String[] args) throws IOException {
-        File testsFolder = new File("tests");
+        File testsFolder = new File("tests/funcs_vars");
 
         // Crear el directorio de funciones (tiene un mapa de funciones y sus tablas de variables)
 
         for (File file : Objects.requireNonNull(testsFolder.listFiles((dir, name) -> name.endsWith(".web")))) {
+            final boolean[] isValid = {true};
             System.out.println("=== Parsing file: " + file.getName() + " ===");
 
             // Leer contenido del archivo .web
@@ -42,6 +44,7 @@ public class Test {
                             int line, int charPositionInLine, String msg, RecognitionException e) {
                         System.err.println("✗ Error de sintaxis en " + file.getName() + " en la línea " + line + ", columna " 
                                 + charPositionInLine + ": " + msg);
+                        isValid[0] = false;
                     }
                 });
 
@@ -50,13 +53,20 @@ public class Test {
 
                 // Imprimir árbol de sintaxis
                 System.out.println(tree.toStringTree(parser));
-                System.out.println("✓ Parsed successfully.\n");
+                
+                if (isValid[0]) System.out.println("✓ Sintaxis correcta.\n");
+                else System.out.println("✗ Sintaxis incorrecta.\n");
 
                 // Aquí es donde entra la semántica
                 // Utilizamos un visitante para recorrer el árbol y realizar la validación semántica
                 SemanticVisitor semanticVisitor = new SemanticVisitor(); // Clase de visitante que hace la validación
                 semanticVisitor.visit(tree); // Recorre el árbol y realiza la validación semántica
 
+                // System.out.println("Cuádruplos generados:");
+                // for (Quadruple quad : semanticVisitor.getQuadruples()) {
+                //     System.out.println(quad);
+                // }
+                System.out.println();
             } catch (Exception e) {
                 System.err.println("✗ Error parsing " + file.getName() + ": " + e.getMessage());
             }

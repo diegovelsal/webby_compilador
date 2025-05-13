@@ -1,0 +1,7 @@
+program conditionTest;
+main {
+  if (a < b) {
+    print("menor");
+  } 
+}
+end

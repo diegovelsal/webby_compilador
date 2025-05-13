@@ -1,0 +1,17 @@
+program programDuplicado;
+
+void hola() [
+    {
+        print("Hola mundo");
+    }
+];
+
+void hola() [
+    {
+        print("Otra versión");
+    }
+];
+
+main {
+}
+end

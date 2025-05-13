@@ -1,0 +1,11 @@
+program printComplejo;
+var 
+  x, y, z: int;
+
+main {
+  x = 4;
+  y = 8;
+  z = 2;
+  print("Resultado: ", x * y + z / (x - 2));
+}
+end

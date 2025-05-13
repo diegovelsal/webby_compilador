@@ -1,7 +1,0 @@
-program myProgram;
-var 
-  a, b, c: int;
-  x, y: float;
-main {
-}
-end

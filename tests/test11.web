@@ -1,9 +1,0 @@
-program ejemplo;
-main
-{
-    if (x < 5)
-    {
-        print("Condicion verdadera");
-    }
-}
-end
