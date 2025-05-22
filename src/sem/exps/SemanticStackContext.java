@@ -21,8 +21,11 @@ public class SemanticStackContext {
     }
 
     public String popOperand() {
-        typeStack.pop();
         return operandStack.pop();
+    }
+
+    public VarType popType() {
+        return this.typeStack.pop();
     }
 
     public void pushOperator(String op) {
@@ -31,6 +34,14 @@ public class SemanticStackContext {
 
     public String popOperator() {
         return operatorStack.pop();
+    }
+
+    public VarType peekType() {
+        return this.typeStack.peek();
+    }
+
+    public String peekOperand() {
+        return this.operandStack.peek();
     }
 
     public String peekOperator() {

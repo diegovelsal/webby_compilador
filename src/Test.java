@@ -8,6 +8,7 @@ import lex_par.WebbyParser;
 import sem.funcs_vars.DirFunc;
 import sem.SemanticVisitor;
 import sem.exps.Quadruple;
+import mem.MemoryManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.Objects;
 
 public class Test {
     public static void main(String[] args) throws IOException {
-        File testsFolder = new File("tests/funcs_vars");
+        File testsFolder = new File("tests/exps");
 
         // Crear el directorio de funciones (tiene un mapa de funciones y sus tablas de variables)
 
@@ -62,11 +63,17 @@ public class Test {
                 SemanticVisitor semanticVisitor = new SemanticVisitor(); // Clase de visitante que hace la validación
                 semanticVisitor.visit(tree); // Recorre el árbol y realiza la validación semántica
 
-                // System.out.println("Cuádruplos generados:");
-                // for (Quadruple quad : semanticVisitor.getQuadruples()) {
-                //     System.out.println(quad);
-                // }
+                System.out.println("Cuádruplos generados:");
+                for (Quadruple quad : semanticVisitor.getQuadruples()) {
+                    System.out.println(quad);
+                }
+
+                System.out.println("Cuádruplos usando memoria:");
+                for (String quad : semanticVisitor.getMemoryQuadruples()) {
+                    System.out.println(quad);
+                }
                 System.out.println();
+                
             } catch (Exception e) {
                 System.err.println("✗ Error parsing " + file.getName() + ": " + e.getMessage());
             }

@@ -1,0 +1,13 @@
+program ifSimple;
+var x: int;
+
+main {
+  x = 10;
+
+  if (x > 5) {
+    print(x);
+  } else {
+    print(0);
+  };
+}
+end
