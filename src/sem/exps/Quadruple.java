@@ -2,13 +2,17 @@ package sem.exps;
 
 import java.util.Map;
 
-import mem.MemoryManager;
+import sem.funcs_vars.ConstTable;
+import sem.funcs_vars.DirFunc;
 
 public class Quadruple {
     private String operator;
     private String leftOperand;
     private String rightOperand;
     private String result;
+    private String leftAddress;
+    private String rightAddress;
+    private String resultAddress;
 
     private static final Map<String, Integer> OPERATOR_CODES = Map.ofEntries(
         Map.entry("+", 1),
@@ -25,11 +29,14 @@ public class Quadruple {
         // Agrega más si es necesario
     );
 
-    public Quadruple(String operator, String leftOperand, String rightOperand, String result) {
+    public Quadruple(String operator, String leftOperand, String rightOperand, String result, DirFunc dirFunc, ConstTable constTable) {
         this.operator = operator;
         this.leftOperand = leftOperand;
         this.rightOperand = rightOperand;
         this.result = result;
+        this.leftAddress = resolveOperandAddress(leftOperand, dirFunc, constTable);
+        this.rightAddress = resolveOperandAddress(rightOperand, dirFunc, constTable);
+        this.resultAddress = resolveOperandAddress(result, dirFunc, constTable);
     }
 
     @Override
@@ -37,35 +44,25 @@ public class Quadruple {
         return "(" + operator + ", " + leftOperand + ", " + rightOperand + ", " + result + ")";
     }
 
-    public String toMemoryString(MemoryManager memoryManager, String currentFunction) {
-        String opCode = getOperatorCode(operator);
-        String left = resolveOperandAddress(leftOperand, memoryManager, currentFunction);
-        String right = resolveOperandAddress(rightOperand, memoryManager, currentFunction);
-        String res = resolveOperandAddress(result, memoryManager, currentFunction);
-        return "(" + opCode + ", " + left + ", " + right + ", " + res + ")";
+    public String toMemoryString() {
+        return "(" + getOperatorCode(operator) + ", " + leftAddress + ", " + rightAddress + ", " + resultAddress + ")";
     }
 
-    private String resolveOperandAddress(String operand, MemoryManager memoryManager, String currentFunction) {
+    private String resolveOperandAddress(String operand, DirFunc dirFunc, ConstTable constTable) {
         if (operand == null || operand.isEmpty()) return "";
 
         if (operand.startsWith("#")) {
-            return operand.substring(1);  // devuelve directamente el número como string
+            return operand.substring(1);  // constante numérica literal
         }
 
-        try {
-            // Si es un número, revisa si está registrado como constante
-            Double.parseDouble(operand);
-            Integer address = memoryManager.getAddress(operand, currentFunction);
-            if (address != null && address != -1) {
-                return address.toString();
-            } else {
-                return operand; // fallback si no está registrado
-            }
-        } catch (NumberFormatException ignored) {
-            // No es número literal, busca como variable/temporal
+        // Checar si es una constante string
+        if (constTable.hasConstant(operand)) {
+            Integer address = constTable.getAddress(operand);
+            return address.toString();
         }
 
-        Integer address = memoryManager.getAddress(operand, currentFunction);
+        // Buscar en el directorio de funciones
+        Integer address = dirFunc.getVariableAddress(operand);
         return (address != null && address != -1) ? address.toString() : operand;
     }
 

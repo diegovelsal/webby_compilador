@@ -9,6 +9,7 @@ import lex_par.WebbyParser;
 import lex_par.WebbyParserBaseVisitor;
 import mem.MemoryManager;
 import sem.funcs_vars.DirFunc;
+import sem.funcs_vars.ConstTable;
 import sem.funcs_vars.VarType;
 import sem.exps.Quadruple;
 import sem.exps.CuboSemantico;
@@ -19,9 +20,9 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     private List<Quadruple> quadruples = new ArrayList<>();
     private SemanticStackContext stackContext = new SemanticStackContext();
     private int tempCounter = 0; // Contador para variables temporales
-    private List<String> memoryQuadruples = new ArrayList<>();
     private CuboSemantico cuboSemantico = new CuboSemantico();
     private MemoryManager memoria = new MemoryManager();
+    private ConstTable constTable = new ConstTable(memoria);
 
     private String generateTemp() {
         return "t" + (tempCounter++);
@@ -29,10 +30,6 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
 
     public List<Quadruple> getQuadruples() {
         return quadruples;
-    }
-
-    public List<String> getMemoryQuadruples() {
-        return memoryQuadruples;
     }
 
     public SemanticVisitor() { }
@@ -87,9 +84,10 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         // 5. Visitar el cuerpo
         visit(ctx.body());
 
+        memoria.resetLocalAndTemp(); // Reiniciar contadores de locales y temporales
+
         return null;
     }
-
 
     @Override
     public String visitVars(WebbyParser.VarsContext ctx) {
@@ -100,18 +98,18 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
             for (TerminalNode idToken : varDecl.id_list().ID()) {
                 String id = idToken.getText();
 
-                if (dirFunc.variableLocalExists(id)) {
-                    throw new IllegalArgumentException("La variable '" + id + "' ya ha sido declarada en el ámbito local.");
+                if (dirFunc.variableExistsInCurrentScope(id)) {
+                    throw new IllegalArgumentException("La variable '" + id + "' ya ha sido declarada en el ámbito " + dirFunc.getCurrentFunction() + ".");
                 }
 
-                dirFunc.addVariable(id, varType);
-
-                // Asignar dirección de memoria
-                if (dirFunc.getCurrentFunction().equals(dirFunc.getGlobalScopeName())) {
-                    memoria.assignGlobal(id, varType);
+                int address;
+                if (dirFunc.globalIsCurrent()) {
+                    address = memoria.assignGlobalAddress(id, varType);
                 } else {
-                    memoria.assignLocal(dirFunc.getCurrentFunction(), id, varType);
+                    address = memoria.assignLocalAddress(varType);
                 }
+
+                dirFunc.addVariable(id, varType, address);
             }
         }
         return null;
@@ -119,41 +117,29 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
 
     @Override
     public String visitParams(WebbyParser.ParamsContext ctx) {
-        // El primer ID y type
-        String firstId = ctx.ID(0).getText();
-        String firstTypeStr = ctx.type(0).getText();
-        VarType firstVarType = VarType.valueOf(firstTypeStr.toUpperCase());
-
-        if (dirFunc.variableLocalExists(firstId)) {
-            throw new IllegalArgumentException("El parámetro '" + firstId + "' ya ha sido declarado en el ámbito local.");
-        }
-        dirFunc.addVariable(firstId, firstVarType);
-
-        // Los siguientes IDs y types en paralelo
-        for (int i = 1; i < ctx.ID().size(); i++) {
+        for (int i = 0; i < ctx.ID().size(); i++) {
             String id = ctx.ID(i).getText();
             String typeStr = ctx.type(i).getText();
             VarType varType = VarType.valueOf(typeStr.toUpperCase());
 
-            if (dirFunc.variableLocalExists(id)) {
-                throw new IllegalArgumentException("El parámetro '" + id + "' ya ha sido declarado en el ámbito local.");
+            if (dirFunc.variableExistsInCurrentScope(id)) {
+                throw new IllegalArgumentException("El parámetro '" + id + "' ya ha sido declarado");
             }
-            dirFunc.addVariable(id, varType);
 
-            // Asignar dirección de memoria
-            memoria.assignLocal(dirFunc.getCurrentFunction(), id, varType);
+            // Obtener dirección y registrar
+            int address = memoria.assignLocalAddress(varType);
+            dirFunc.addParameter(id, varType, address);
         }
 
         return null;
     }
-
 
     @Override
     public String visitAssign(WebbyParser.AssignContext ctx) {
         String id = ctx.ID().getText();
 
         // Verificar que la variable existe
-        if (!dirFunc.variableLocalExists(id) && !dirFunc.variableGlobalExists(id)) {
+        if (!dirFunc.variableExists(id)) {
             throw new RuntimeException("Error: Variable '" + id + "' usada en asignación sin ser declarada.");
         }
 
@@ -174,9 +160,7 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         }
 
         // Generar cuádruplo de asignación
-        quadruples.add(new Quadruple("=", exprValue, "_", id));
-
-        memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+        quadruples.add(new Quadruple("=", exprValue, "", id, dirFunc, constTable));
         return null;
     }
 
@@ -185,7 +169,7 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     public String visitFactor(WebbyParser.FactorContext ctx) {
         if (ctx.ID() != null) {
             String id = ctx.ID().getText();
-            if (!dirFunc.variableLocalExists(id) && !dirFunc.variableGlobalExists(id)) {
+            if (!dirFunc.variableExists(id)) {
                 throw new RuntimeException("Error: Variable '" + id + "' usada sin ser declarada.");
             }
 
@@ -197,15 +181,15 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
             if (ctx.cte().CTE_INT() != null) {
                 String intValue = ctx.cte().CTE_INT().getText();
                 stackContext.pushOperand(intValue, VarType.INT);
-                if (!memoria.isConstantRegistered(intValue)) {
-                    memoria.assignConst(intValue, VarType.INT);
+                if (!constTable.hasConstant(intValue)) {
+                    constTable.addConstant(intValue, VarType.INT);
                 }
                 return intValue;
             } else if (ctx.cte().CTE_FLOAT() != null) {
                 String floatValue = ctx.cte().CTE_FLOAT().getText();
                 stackContext.pushOperand(floatValue, VarType.FLOAT);
-                if (!memoria.isConstantRegistered(floatValue)) {
-                    memoria.assignConst(floatValue, VarType.FLOAT);
+                if (!constTable.hasConstant(floatValue)) {
+                    constTable.addConstant(floatValue, VarType.FLOAT);
                 }
                 return floatValue;
             }
@@ -240,15 +224,18 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
             String op = stackContext.popOperator();
 
             // Validar operación (puedes tener una tabla semántica, o simplemente unifica tipos aquí)
-            VarType resultType = cuboSemantico.getResultType(op, leftType, rightType); // Por ejemplo, si hay FLOAT, gana FLOAT
+            VarType resultType = cuboSemantico.getResultType(op, leftType, rightType); 
+            if (resultType == null) {
+                throw new RuntimeException("Error semántico: tipos incompatibles " + leftType + " " + op + " " + rightType);
+            }
 
             // Generar temporal y asignarle dirección
             String tempName = generateTemp(); // p.ej. t1, t2, etc.
-            memoria.assignTemp(tempName, resultType);
+            int tempAddress = memoria.assignTempAddress(resultType);
+            dirFunc.addVariable(tempName, resultType, tempAddress);
 
             // Crear el cuádruplo
-            quadruples.add(new Quadruple(op, leftOperand, rightOperand, tempName));
-            memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+            quadruples.add(new Quadruple(op, leftOperand, rightOperand, tempName, dirFunc, constTable));
 
             // Empujar el resultado a la pila
             stackContext.pushOperand(tempName, resultType);
@@ -287,12 +274,12 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
                 }
 
                 // Crear temporal de tipo BOOL
-                String tempName = generateTemp();
-                memoria.assignTemp(tempName, resultType);  // BOOL
+                String tempName = generateTemp(); // p.ej. t1, t2, etc.
+                int tempAddress = memoria.assignTempAddress(resultType);
+                dirFunc.addVariable(tempName, resultType, tempAddress);
 
                 // Crear cuádruplo
-                quadruples.add(new Quadruple(op, leftOperand, rightOperand, tempName));
-                memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+                quadruples.add(new Quadruple(op, leftOperand, rightOperand, tempName, dirFunc, constTable));
 
                 // Empujar resultado a la pila
                 stackContext.pushOperand(tempName, resultType);
@@ -331,12 +318,12 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
             }
 
             // Crear temporal
-            String tempName = generateTemp();
-            memoria.assignTemp(tempName, resultType);
+            String tempName = generateTemp(); // p.ej. t1, t2, etc.
+            int tempAddress = memoria.assignTempAddress(resultType);
+            dirFunc.addVariable(tempName, resultType, tempAddress);
 
             // Cuádruplo
-            quadruples.add(new Quadruple(op, leftOperand, rightOperand, tempName));
-            memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+            quadruples.add(new Quadruple(op, leftOperand, rightOperand, tempName, dirFunc, constTable));
 
             // Empuja resultado
             stackContext.pushOperand(tempName, resultType);
@@ -345,24 +332,20 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         return stackContext.peekOperand();
     }
 
-
     @Override
     public String visitPrint_arg(WebbyParser.Print_argContext ctx) {
         if (ctx.CTE_STRING() != null) {
             String str = ctx.CTE_STRING().getText();
 
             // Asegurarse de que esté registrada como constante
-            if (!memoria.isConstantRegistered(str)) {
-                memoria.assignConst(str, VarType.STRING);
+            if (!constTable.hasConstant(str)) {
+                constTable.addConstant(str, VarType.STRING);
             }
 
-            quadruples.add(new Quadruple("PRINT", "_", "_", str));
-            memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
-
+            quadruples.add(new Quadruple("PRINT", "", "", str, dirFunc, constTable));
         } else if (ctx.expresion() != null) {
             String result = visit(ctx.expresion());
-            quadruples.add(new Quadruple("PRINT", "_", "_", result));
-            memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+            quadruples.add(new Quadruple("PRINT", "", "", result, dirFunc, constTable));
         }
 
         return null;
@@ -375,22 +358,19 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
 
         // 2. Crear GOTOF con salto pendiente
         int gotofIndex = quadruples.size();
-        quadruples.add(new Quadruple("GOTOF", conditionResult, "", "#-1"));  // marcador temporal
-        memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+        quadruples.add(new Quadruple("GOTOF", conditionResult, "", "#-1", dirFunc, constTable));  // marcador temporal
 
         // 3. Visitar body verdadero (if)
         visit(ctx.body(0));
 
         // 4. Crear GOTO al final del if/else
         int gotoEndIndex = quadruples.size();
-        quadruples.add(new Quadruple("GOTO", "", "", "#-1"));  // marcador temporal
-        memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+        quadruples.add(new Quadruple("GOTO", "", "", "#-1", dirFunc, constTable));  // marcador temporal
 
         // 5. Rellenar el salto del GOTOF (posición del else)
         int elseStart = quadruples.size();
         Quadruple gotof = quadruples.get(gotofIndex);
-        quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + elseStart));
-        memoryQuadruples.set(gotofIndex, quadruples.get(gotofIndex).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+        quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + elseStart, dirFunc, constTable));
 
         // 6. Visitar body falso (else)
         visit(ctx.body(1));
@@ -398,8 +378,7 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         // 7. Rellenar el salto del GOTO al final
         int end = quadruples.size();
         Quadruple gotoEnd = quadruples.get(gotoEndIndex);
-        quadruples.set(gotoEndIndex, new Quadruple("GOTO", "", "", "#" + end));
-        memoryQuadruples.set(gotoEndIndex, quadruples.get(gotoEndIndex).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+        quadruples.set(gotoEndIndex, new Quadruple("GOTO", "", "", "#" + end, dirFunc, constTable));
 
         return null;
     }
@@ -414,22 +393,18 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
 
         // 3. Crear GOTOF con salto pendiente
         int gotofIndex = quadruples.size();
-        quadruples.add(new Quadruple("GOTOF", conditionResult, "", "#-1")); // marcador temporal
-        memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
-
+        quadruples.add(new Quadruple("GOTOF", conditionResult, "", "#-1", dirFunc, constTable)); // marcador temporal
 
         // 4. Visitar el cuerpo del ciclo
         visit(ctx.body());
 
         // 5. Agregar GOTO para regresar al inicio del ciclo
-        quadruples.add(new Quadruple("GOTO", "", "", "#" + loopStart));
-        memoryQuadruples.add(quadruples.get(quadruples.size() - 1).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+        quadruples.add(new Quadruple("GOTO", "", "", "#" + loopStart, dirFunc, constTable)); // salto al inicio del ciclo
 
         // 6. Rellenar el salto del GOTOF con la posición actual
         int end = quadruples.size();
         Quadruple gotof = quadruples.get(gotofIndex);
-        quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + end));
-        memoryQuadruples.set(gotofIndex, quadruples.get(gotofIndex).toMemoryString(memoria, dirFunc.getCurrentFunction()));
+        quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + end, dirFunc, constTable));
 
         return null;
     }
