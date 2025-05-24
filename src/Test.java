@@ -67,7 +67,8 @@ public class Test {
                 for (Quadruple quad : semanticVisitor.getQuadruples()) {
                     System.out.println(quad);
                 }
-
+                System.out.println();
+                
                 System.out.println("Cuádruplos usando memoria:");
                 for (Quadruple quad : semanticVisitor.getQuadruples()) {
                     System.out.println(quad.toMemoryString());
