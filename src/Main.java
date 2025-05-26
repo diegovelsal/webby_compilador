@@ -5,7 +5,10 @@ import org.antlr.v4.runtime.tree.*;
 
 import lex_par.WebbyLexer;
 import lex_par.WebbyParser;
+import sem.funcs_vars.ConstTable;
 import sem.funcs_vars.DirFunc;
+import vm.VirtualMachine;
+import vm.VirtualMemory;
 import sem.SemanticVisitor;
 import sem.exps.Quadruple;
 import mem.MemoryManager;
@@ -13,11 +16,12 @@ import mem.MemoryManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Objects;
 
-public class Test {
+public class Main {
     public static void main(String[] args) throws IOException {
-        File testsFolder = new File("tests/exps");
+        File testsFolder = new File("tests/vmt");
 
         // Crear el directorio de funciones (tiene un mapa de funciones y sus tablas de variables)
 
@@ -63,17 +67,27 @@ public class Test {
                 SemanticVisitor semanticVisitor = new SemanticVisitor(); // Clase de visitante que hace la validación
                 semanticVisitor.visit(tree); // Recorre el árbol y realiza la validación semántica
 
+                List<Quadruple> quadruples = semanticVisitor.getQuadruples();
+
                 System.out.println("Cuádruplos generados:");
-                for (Quadruple quad : semanticVisitor.getQuadruples()) {
+                for (Quadruple quad : quadruples) {
                     System.out.println(quad);
                 }
                 System.out.println();
                 
                 System.out.println("Cuádruplos usando memoria:");
-                for (Quadruple quad : semanticVisitor.getQuadruples()) {
+                for (Quadruple quad : quadruples) {
                     System.out.println(quad.toMemoryString());
                 }
                 System.out.println();
+
+                DirFunc dirFunc = semanticVisitor.getDirFunc();
+                ConstTable constTable = semanticVisitor.getConstTable();
+
+                VirtualMachine vm = new VirtualMachine(quadruples, dirFunc, constTable);
+                System.out.println("=== Ejecutando programa ===");
+                vm.execute();
+                System.out.println("=== Ejecución terminada ===\n");
                 
             } catch (Exception e) {
                 System.err.println("✗ Error parsing " + file.getName() + ": " + e.getMessage());

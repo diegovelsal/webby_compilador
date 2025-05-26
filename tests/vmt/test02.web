@@ -1,0 +1,23 @@
+program pruebaIfPrint;
+var
+  x, y, z, resultado: int;
+  f: float;
+
+main {
+  x = 10;
+  y = 10;
+  z = 5;
+  f = 3.14;
+
+  if (x != y) {
+    print("x no es igual que y");
+    resultado = -1;
+  } else {
+    print("x es igual que y");
+    resultado = 1;
+  };
+
+  print("resultado:", resultado);
+  print("valor de f:", f);
+}
+end

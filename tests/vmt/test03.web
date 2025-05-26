@@ -1,0 +1,14 @@
+program sumaWhile;
+var 
+  i, suma: int;
+
+main {
+  i = 1;
+  suma = 0;
+  while (i < 5) do {
+    suma = suma + i;
+    i = i + 1;
+  };
+  print("La suma es:", suma);
+}
+end

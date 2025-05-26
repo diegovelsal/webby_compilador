@@ -1,0 +1,25 @@
+program myProgram;
+
+var
+    x, y : int;
+    z : float;
+
+void saludar(nombre : int) [
+    {
+        print("Hola");
+        print(nombre);
+    }
+];
+
+void iniciar() [
+    {
+        saludar(100);
+    }
+];
+
+main {
+    x = 5;
+    iniciar();
+    print("Fin del programa");
+}
+end

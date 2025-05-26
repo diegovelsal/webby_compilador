@@ -51,4 +51,8 @@ public class VarTable {
     public boolean hasVariable(String name) {
         return variables.containsKey(name);
     }
+
+    public HashMap<String, VarInfo> getVariables() {
+        return variables;
+    }
 }

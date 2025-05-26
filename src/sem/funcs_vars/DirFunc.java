@@ -2,6 +2,7 @@ package sem.funcs_vars;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 
 public class DirFunc {
     public static class Parameter {
@@ -29,12 +30,12 @@ public class DirFunc {
     }
     public class FunctionInfo {
         private final VarTable varTable;
-        private final java.util.List<Parameter> parameters;
+        private final List<Parameter> parameters;
         private int startQuad;
 
         public FunctionInfo() {
             this.varTable = new VarTable();
-            this.parameters = new java.util.ArrayList<>();
+            this.parameters = new ArrayList<>();
         }
 
         public VarTable getVarTable() {
@@ -93,8 +94,19 @@ public class DirFunc {
         return currentFunction;
     }
 
+    public VarTable getGlobalVarTable() {
+        return functions.get(globalScopeName).getVarTable();
+    }
+
     public VarTable getCurrentVarTable() {
         return functions.get(currentFunction).getVarTable();
+    }
+
+    public VarTable getVarTable(String funcName) {
+        if (!functions.containsKey(funcName)) {
+            throw new IllegalArgumentException("Función '" + funcName + "' no existe.");
+        }
+        return functions.get(funcName).getVarTable();
     }
 
     public void addVariable(String name, VarType type, int address) {
@@ -150,4 +162,13 @@ public class DirFunc {
         }
         throw new IllegalArgumentException("Variable '" + name + "' no encontrada.");
     }
+
+    public int getParameterAddress(String funcName, int index) {
+        List<Parameter> params = functions.get(funcName).getParameters();
+        if (index < 0 || index >= params.size()) {
+            throw new IndexOutOfBoundsException("Índice de parámetro inválido: " + index);
+        }
+        return params.get(index).getAddress();
+    }
+
 }

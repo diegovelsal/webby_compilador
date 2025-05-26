@@ -10,9 +10,10 @@ public class Quadruple {
     private String leftOperand;
     private String rightOperand;
     private String result;
-    private String leftAddress;
-    private String rightAddress;
-    private String resultAddress;
+    private int operatorCode;
+    private int leftAddress;
+    private int rightAddress;
+    private int resultAddress;
 
     private static final Map<String, Integer> OPERATOR_CODES = Map.ofEntries(
         Map.entry("+", 1),
@@ -25,8 +26,12 @@ public class Quadruple {
         Map.entry(">", 8),
         Map.entry("PRINT", 9),
         Map.entry("GOTO", 10),
-        Map.entry("GOTOF", 11)
-        // Agrega más si es necesario
+        Map.entry("GOTOF", 11),
+        Map.entry("ERA", 12),
+        Map.entry("PARAM", 13),
+        Map.entry("GOSUB", 14),
+        Map.entry("ENDFUNC", 15),
+        Map.entry("ENDPROG", 16)
     );
 
     public Quadruple(String operator, String leftOperand, String rightOperand, String result, DirFunc dirFunc, ConstTable constTable) {
@@ -34,6 +39,7 @@ public class Quadruple {
         this.leftOperand = leftOperand;
         this.rightOperand = rightOperand;
         this.result = result;
+        this.operatorCode = OPERATOR_CODES.get(operator);
         this.leftAddress = resolveOperandAddress(leftOperand, dirFunc, constTable);
         this.rightAddress = resolveOperandAddress(rightOperand, dirFunc, constTable);
         this.resultAddress = resolveOperandAddress(result, dirFunc, constTable);
@@ -45,30 +51,31 @@ public class Quadruple {
     }
 
     public String toMemoryString() {
-        return "(" + getOperatorCode(operator) + ", " + leftAddress + ", " + rightAddress + ", " + resultAddress + ")";
+        String arg1 = (leftAddress == 0) ? leftOperand : String.valueOf(leftAddress);
+        String arg2 = (rightAddress == 0) ? rightOperand : String.valueOf(rightAddress);
+        String arg3 = (resultAddress == 0) ? result : String.valueOf(resultAddress);
+        
+        return "(" + operatorCode + ", " + arg1 + ", " + arg2 + ", " + arg3 + ")";
     }
 
-    private String resolveOperandAddress(String operand, DirFunc dirFunc, ConstTable constTable) {
-        if (operand == null || operand.isEmpty()) return "";
+    private int resolveOperandAddress(String operand, DirFunc dirFunc, ConstTable constTable) {
+        if (operand == null || operand.isEmpty()) return 0;
 
         if (operand.startsWith("#")) {
-            return operand.substring(1);  // constante numérica literal
+            return Integer.parseInt(operand.substring(1));  // constante numérica literal
         }
 
         // Checar si es una constante string
         if (constTable.hasConstant(operand)) {
-            Integer address = constTable.getAddress(operand);
-            return address.toString();
+            return constTable.getAddress(operand);
         }
 
         // Buscar en el directorio de funciones
-        Integer address = dirFunc.getVariableAddress(operand);
-        return (address != null && address != -1) ? address.toString() : operand;
-    }
+        if (dirFunc.variableExists(operand)) {
+            return dirFunc.getVariableAddress(operand);
+        }
 
-    private String getOperatorCode(String op) {
-        Integer code = OPERATOR_CODES.get(op);
-        return (code != null) ? code.toString() : op;  // Si no se reconoce, regresa el símbolo original
+        return 0;  // Si no se encuentra, regresa el símbolo original
     }
 
     // Getters si los necesitas
@@ -76,4 +83,9 @@ public class Quadruple {
     public String getLeftOperand() { return leftOperand; }
     public String getRightOperand() { return rightOperand; }
     public String getResult() { return result; }
+    public int getOperatorCode() { return operatorCode; }
+    public int getLeftAddress() { return leftAddress; }
+    public int getRightAddress() { return rightAddress; }
+    public int getResultAddress() { return resultAddress; }
+
 }

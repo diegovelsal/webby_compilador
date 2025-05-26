@@ -32,4 +32,8 @@ public class ConstTable {
         }
         return constantMap.get(value); // Devuelve la dirección siempre
     }
+
+    public Map<String, Integer> getConstantMap() {
+        return constantMap;
+    }
 }

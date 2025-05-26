@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedList;
 
 import lex_par.WebbyParser;
 import lex_par.WebbyParserBaseVisitor;
@@ -23,6 +24,8 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     private CuboSemantico cuboSemantico = new CuboSemantico();
     private MemoryManager memoria = new MemoryManager();
     private ConstTable constTable = new ConstTable(memoria);
+    private LinkedList<String> argumentQueue = new LinkedList<>();
+    private LinkedList<VarType> argumentTypeQueue = new LinkedList<>();
 
     private String generateTemp() {
         return "t" + (tempCounter++);
@@ -32,6 +35,14 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         return quadruples;
     }
 
+    public ConstTable getConstTable() {
+        return constTable;
+    }
+
+    public DirFunc getDirFunc() {
+        return dirFunc;
+    }
+
     public SemanticVisitor() { }
 
     @Override
@@ -39,11 +50,14 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         String globalName = ctx.ID().getText();
 
         dirFunc = new DirFunc(globalName); 
-
+        
         // Primero visita las variables globales (si hay)
         if (ctx.vars() != null) {
             visit(ctx.vars());
         }
+
+        int gotoMainIndex = quadruples.size();
+        quadruples.add(new Quadruple("GOTO", "", "", "#-1", dirFunc, constTable)); 
 
         // Luego las funciones (si hay)
         if (ctx.funcs_list() != null) {
@@ -52,10 +66,12 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
 
         // Antes de visitar MAIN, aseguramos que currentFunction vuelva a ser el programa
         dirFunc.setCurrentFunction(globalName);
-
+        quadruples.set(gotoMainIndex, new Quadruple("GOTO", "", "", "#" + quadruples.size(), dirFunc, constTable));
         // Visita el cuerpo principal del programa
         visit(ctx.body());
 
+        // Generar cuádruplo de fin de programa
+        quadruples.add(new Quadruple("ENDPROG", "", "", "", dirFunc, constTable));
         return null;
     }
 
@@ -70,6 +86,7 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
 
         // 2. Cambiar la función al current
         dirFunc.setCurrentFunction(funcName);
+        dirFunc.setFunctionStartQuad(funcName, quadruples.size());
 
         // 3. Registrar parámetros si existen
         if (ctx.params() != null) {
@@ -84,7 +101,11 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         // 5. Visitar el cuerpo
         visit(ctx.body());
 
-        memoria.resetLocalAndTemp(); // Reiniciar contadores de locales y temporales
+        // 6. Limpiar memoria local y temporales
+        memoria.resetLocalAndTemp();
+
+        // 7. Generar cuádruplo de fin de función
+        quadruples.add(new Quadruple("ENDFUNC", "", "", "", dirFunc, constTable));
 
         return null;
     }
@@ -335,7 +356,7 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     @Override
     public String visitPrint_arg(WebbyParser.Print_argContext ctx) {
         if (ctx.CTE_STRING() != null) {
-            String str = ctx.CTE_STRING().getText();
+            String str = ctx.CTE_STRING().getText().replace("\"", ""); // Eliminar comillas
 
             // Asegurarse de que esté registrada como constante
             if (!constTable.hasConstant(str)) {
@@ -405,6 +426,71 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         int end = quadruples.size();
         Quadruple gotof = quadruples.get(gotofIndex);
         quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + end, dirFunc, constTable));
+
+        return null;
+    }
+
+    @Override
+    public String visitF_call(WebbyParser.F_callContext ctx) {
+        String funcName = ctx.ID().getText();
+
+        // 1. Verificar que la función existe
+        if (!dirFunc.hasFunction(funcName)) {
+            throw new RuntimeException("Error: Función '" + funcName + "' no declarada.");
+        }
+
+        // 2. Generar cuádruplo de ERA
+        quadruples.add(new Quadruple("ERA", "", "", funcName, dirFunc, constTable));
+
+        // 3. Obtener parámetros esperados de la función
+        List<DirFunc.Parameter> expectedParams = dirFunc.getFunctionParameters(funcName);
+
+        // 4. Procesar los argumentos
+        if (ctx.args() != null) {
+            visit(ctx.args());
+        }
+
+        // 5. Validar número de argumentos
+        if (argumentQueue.size() != expectedParams.size()) {
+            throw new RuntimeException("Error: Número de argumentos no coincide para la función '" + funcName + "'. Se esperaban " + expectedParams.size() + ", se recibieron " + argumentQueue.size());
+        }
+
+        // 6. Generar cuádruplos de PARAM, validando tipos
+        for (int i = 0; i < expectedParams.size(); i++) {
+            String argAddress = argumentQueue.poll();
+            VarType argType = argumentTypeQueue.poll();
+
+            VarType expectedType = expectedParams.get(i).getType();
+
+            if (!argType.equals(expectedType)) {
+                throw new RuntimeException("Error de tipo en argumento " + (i + 1) + ": se esperaba " +
+                        expectedType + ", pero se recibió " + argType);
+            }
+
+            quadruples.add(new Quadruple("PARAM", argAddress, "", "param" + i, dirFunc, constTable));
+        }
+
+        // 7. Generar cuádruplo de GOSUB
+        int startQuad = dirFunc.getFunctionStartQuad(funcName);
+        quadruples.add(new Quadruple("GOSUB", "", "", "#" + startQuad, dirFunc, constTable));
+
+        return null;
+    }
+
+    @Override
+    public String visitArgs(WebbyParser.ArgsContext ctx) {
+        argumentQueue.clear();
+        argumentTypeQueue.clear();
+
+        for (WebbyParser.ExpresionContext exprCtx : ctx.expresion()) {
+            String result = visit(exprCtx); // Esto empuja a operandStack
+
+            String argAddr = stackContext.popOperand(); // Dirección del argumento
+            VarType argType = stackContext.popType();   // Tipo del argumento
+
+            argumentQueue.add(argAddr);
+            argumentTypeQueue.add(argType);
+        }
 
         return null;
     }

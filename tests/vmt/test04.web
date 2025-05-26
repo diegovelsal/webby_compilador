@@ -1,0 +1,36 @@
+program pruebaCompleta;
+
+var
+  x, y, z: int;
+  f, g: float;
+
+void multiplicarPorDos(num: int) [
+{
+  num = num * 2;
+  print("Dentro de multiplicarPorDos, num = ", num);
+}
+];
+
+main {
+  x = 5;
+  y = 10;
+  z = 0;
+  f = 2.5;
+  g = 3.75;
+
+  if (x < y) {
+    z = x + y * 2;
+  } else {
+    z = x - y / 2;
+  };
+
+  while (z > 0) do {
+    print("Valor de z: ", z);
+    z = z - 1;
+  };
+
+  multiplicarPorDos(x);
+
+  print("Resultado final f + g = ", f + g);
+}
+end
