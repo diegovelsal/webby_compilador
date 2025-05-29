@@ -1,4 +1,4 @@
-// Generated from src/lex_par/WebbyParser.g4 by ANTLR 4.13.2
+// Generated from ./src/lex_par/WebbyParser.g4 by ANTLR 4.13.2
 package lex_par;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -132,6 +132,18 @@ public class WebbyParserBaseListener implements WebbyParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitStatement(WebbyParser.StatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterReturn(WebbyParser.ReturnContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitReturn(WebbyParser.ReturnContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

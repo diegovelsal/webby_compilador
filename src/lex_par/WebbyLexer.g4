@@ -13,6 +13,7 @@ DO      : 'do';
 VOID    : 'void';
 INT     : 'int';
 FLOAT   : 'float';
+RETURN  : 'return';
 
 // Identificadores y Constantes
 ID        : [a-zA-Z_][a-zA-Z0-9_]*;
