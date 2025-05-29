@@ -21,7 +21,7 @@ import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        File testsFolder = new File("tests/vmt");
+        File testsFolder = new File("tests/fact_fib");
 
         // Crear el directorio de funciones (tiene un mapa de funciones y sus tablas de variables)
 

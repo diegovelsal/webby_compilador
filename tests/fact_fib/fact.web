@@ -1,0 +1,19 @@
+program factorialMain;
+
+var
+    n : int;
+    i : int;
+    result : int;
+
+main {
+    n = 6;
+    i = 1;
+    result = 1;
+    while (i < n) do {
+        result = result * i;
+        i = i + 1;
+    };
+    print("Factorial desde main:", result);
+}
+
+end

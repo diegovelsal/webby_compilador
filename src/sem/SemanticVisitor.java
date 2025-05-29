@@ -125,7 +125,7 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
 
                 int address;
                 if (dirFunc.globalIsCurrent()) {
-                    address = memoria.assignGlobalAddress(id, varType);
+                    address = memoria.assignGlobalAddress(varType);
                 } else {
                     address = memoria.assignLocalAddress(varType);
                 }
@@ -151,6 +151,81 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
             int address = memoria.assignLocalAddress(varType);
             dirFunc.addParameter(id, varType, address);
         }
+
+        return null;
+    }
+
+    @Override
+    public String visitPrint_arg(WebbyParser.Print_argContext ctx) {
+        if (ctx.CTE_STRING() != null) {
+            String str = ctx.CTE_STRING().getText().replace("\"", ""); // Eliminar comillas
+
+            // Asegurarse de que esté registrada como constante
+            if (!constTable.hasConstant(str)) {
+                constTable.addConstant(str, VarType.STRING);
+            }
+
+            quadruples.add(new Quadruple("PRINT", "", "", str, dirFunc, constTable));
+        } else if (ctx.expresion() != null) {
+            String result = visit(ctx.expresion());
+            quadruples.add(new Quadruple("PRINT", "", "", result, dirFunc, constTable));
+        }
+
+        return null;
+    }
+
+    @Override
+    public String visitCondition(WebbyParser.ConditionContext ctx) {
+        // 1. Visitar la expresión y obtener resultado de la condición
+        String conditionResult = visit(ctx.expresion());
+
+        // 2. Crear GOTOF con salto pendiente
+        int gotofIndex = quadruples.size();
+        quadruples.add(new Quadruple("GOTOF", conditionResult, "", "#-1", dirFunc, constTable));  // marcador temporal
+
+        // 3. Visitar body verdadero (if)
+        visit(ctx.body(0));
+
+        // 4. Crear GOTO al final del if/else
+        int gotoEndIndex = quadruples.size();
+        quadruples.add(new Quadruple("GOTO", "", "", "#-1", dirFunc, constTable));  // marcador temporal
+
+        // 5. Rellenar el salto del GOTOF (posición del else)
+        int elseStart = quadruples.size();
+        quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + elseStart, dirFunc, constTable));
+
+        // 6. Visitar body falso (else)
+        visit(ctx.body(1));
+
+        // 7. Rellenar el salto del GOTO al final
+        int end = quadruples.size();
+        quadruples.set(gotoEndIndex, new Quadruple("GOTO", "", "", "#" + end, dirFunc, constTable));
+
+        return null;
+    }
+
+    @Override
+    public String visitCycle(WebbyParser.CycleContext ctx) {
+        // 1. Guardar el inicio del ciclo
+        int loopStart = quadruples.size();
+
+        // 2. Evaluar condición
+        String conditionResult = visit(ctx.expresion());
+
+        // 3. Crear GOTOF con salto pendiente
+        int gotofIndex = quadruples.size();
+        quadruples.add(new Quadruple("GOTOF", conditionResult, "", "#-1", dirFunc, constTable)); // marcador temporal
+
+        // 4. Visitar el cuerpo del ciclo
+        visit(ctx.body());
+
+        // 5. Agregar GOTO para regresar al inicio del ciclo
+        quadruples.add(new Quadruple("GOTO", "", "", "#" + loopStart, dirFunc, constTable)); // salto al inicio del ciclo
+
+        // 6. Rellenar el salto del GOTOF con la posición actual
+        int end = quadruples.size();
+        Quadruple gotof = quadruples.get(gotofIndex);
+        quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + end, dirFunc, constTable));
 
         return null;
     }
@@ -183,87 +258,6 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         // Generar cuádruplo de asignación
         quadruples.add(new Quadruple("=", exprValue, "", id, dirFunc, constTable));
         return null;
-    }
-
-
-    @Override
-    public String visitFactor(WebbyParser.FactorContext ctx) {
-        if (ctx.ID() != null) {
-            String id = ctx.ID().getText();
-            if (!dirFunc.variableExists(id)) {
-                throw new RuntimeException("Error: Variable '" + id + "' usada sin ser declarada.");
-            }
-
-            VarType varType = dirFunc.getVariableType(id);
-            stackContext.pushOperand(id, varType);
-            return id;
-
-        } else if (ctx.cte() != null) {
-            if (ctx.cte().CTE_INT() != null) {
-                String intValue = ctx.cte().CTE_INT().getText();
-                stackContext.pushOperand(intValue, VarType.INT);
-                if (!constTable.hasConstant(intValue)) {
-                    constTable.addConstant(intValue, VarType.INT);
-                }
-                return intValue;
-            } else if (ctx.cte().CTE_FLOAT() != null) {
-                String floatValue = ctx.cte().CTE_FLOAT().getText();
-                stackContext.pushOperand(floatValue, VarType.FLOAT);
-                if (!constTable.hasConstant(floatValue)) {
-                    constTable.addConstant(floatValue, VarType.FLOAT);
-                }
-                return floatValue;
-            }
-
-        } else if (ctx.expresion() != null) {
-            // Subexpresión entre paréntesis
-            return visit(ctx.expresion());
-        }
-
-        return null; // No debería llegar aquí
-    }
-
-    @Override
-    public String visitTermino(WebbyParser.TerminoContext ctx) {
-        // Visita el primer factor (esto ya empuja su operando a la pila)
-        visit(ctx.factor(0));
-
-        for (int i = 1; i < ctx.factor().size(); i++) {
-            String operator = ctx.getChild(i * 2 - 1).getText(); // "*" o "/"
-            stackContext.pushOperator(operator);
-
-            // Visita el siguiente factor (esto también empuja su operando)
-            visit(ctx.factor(i));
-
-            // Saca operandos y tipos
-            String rightOperand = stackContext.popOperand();
-            VarType rightType = stackContext.popType();
-
-            String leftOperand = stackContext.popOperand();
-            VarType leftType = stackContext.popType();
-
-            String op = stackContext.popOperator();
-
-            // Validar operación (puedes tener una tabla semántica, o simplemente unifica tipos aquí)
-            VarType resultType = cuboSemantico.getResultType(op, leftType, rightType); 
-            if (resultType == null) {
-                throw new RuntimeException("Error semántico: tipos incompatibles " + leftType + " " + op + " " + rightType);
-            }
-
-            // Generar temporal y asignarle dirección
-            String tempName = generateTemp(); // p.ej. t1, t2, etc.
-            int tempAddress = memoria.assignTempAddress(resultType);
-            dirFunc.addVariable(tempName, resultType, tempAddress);
-
-            // Crear el cuádruplo
-            quadruples.add(new Quadruple(op, leftOperand, rightOperand, tempName, dirFunc, constTable));
-
-            // Empujar el resultado a la pila
-            stackContext.pushOperand(tempName, resultType);
-        }
-
-        // El resultado queda en la cima de la pila
-        return stackContext.peekOperand();
     }
 
     @Override
@@ -354,80 +348,83 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     }
 
     @Override
-    public String visitPrint_arg(WebbyParser.Print_argContext ctx) {
-        if (ctx.CTE_STRING() != null) {
-            String str = ctx.CTE_STRING().getText().replace("\"", ""); // Eliminar comillas
+    public String visitTermino(WebbyParser.TerminoContext ctx) {
+        // Visita el primer factor (esto ya empuja su operando a la pila)
+        visit(ctx.factor(0));
 
-            // Asegurarse de que esté registrada como constante
-            if (!constTable.hasConstant(str)) {
-                constTable.addConstant(str, VarType.STRING);
+        for (int i = 1; i < ctx.factor().size(); i++) {
+            String operator = ctx.getChild(i * 2 - 1).getText(); // "*" o "/"
+            stackContext.pushOperator(operator);
+
+            // Visita el siguiente factor (esto también empuja su operando)
+            visit(ctx.factor(i));
+
+            // Saca operandos y tipos
+            String rightOperand = stackContext.popOperand();
+            VarType rightType = stackContext.popType();
+
+            String leftOperand = stackContext.popOperand();
+            VarType leftType = stackContext.popType();
+
+            String op = stackContext.popOperator();
+
+            // Validar operación (puedes tener una tabla semántica, o simplemente unifica tipos aquí)
+            VarType resultType = cuboSemantico.getResultType(op, leftType, rightType); 
+            if (resultType == null) {
+                throw new RuntimeException("Error semántico: tipos incompatibles " + leftType + " " + op + " " + rightType);
             }
 
-            quadruples.add(new Quadruple("PRINT", "", "", str, dirFunc, constTable));
-        } else if (ctx.expresion() != null) {
-            String result = visit(ctx.expresion());
-            quadruples.add(new Quadruple("PRINT", "", "", result, dirFunc, constTable));
+            // Generar temporal y asignarle dirección
+            String tempName = generateTemp(); // p.ej. t1, t2, etc.
+            int tempAddress = memoria.assignTempAddress(resultType);
+            dirFunc.addVariable(tempName, resultType, tempAddress);
+
+            // Crear el cuádruplo
+            quadruples.add(new Quadruple(op, leftOperand, rightOperand, tempName, dirFunc, constTable));
+
+            // Empujar el resultado a la pila
+            stackContext.pushOperand(tempName, resultType);
         }
 
-        return null;
+        // El resultado queda en la cima de la pila
+        return stackContext.peekOperand();
     }
 
     @Override
-    public String visitCondition(WebbyParser.ConditionContext ctx) {
-        // 1. Visitar la expresión y obtener resultado de la condición
-        String conditionResult = visit(ctx.expresion());
+    public String visitFactor(WebbyParser.FactorContext ctx) {
+        if (ctx.ID() != null) {
+            String id = ctx.ID().getText();
+            if (!dirFunc.variableExists(id)) {
+                throw new RuntimeException("Error: Variable '" + id + "' usada sin ser declarada.");
+            }
 
-        // 2. Crear GOTOF con salto pendiente
-        int gotofIndex = quadruples.size();
-        quadruples.add(new Quadruple("GOTOF", conditionResult, "", "#-1", dirFunc, constTable));  // marcador temporal
+            VarType varType = dirFunc.getVariableType(id);
+            stackContext.pushOperand(id, varType);
+            return id;
 
-        // 3. Visitar body verdadero (if)
-        visit(ctx.body(0));
+        } else if (ctx.cte() != null) {
+            if (ctx.cte().CTE_INT() != null) {
+                String intValue = ctx.cte().CTE_INT().getText();
+                stackContext.pushOperand(intValue, VarType.INT);
+                if (!constTable.hasConstant(intValue)) {
+                    constTable.addConstant(intValue, VarType.INT);
+                }
+                return intValue;
+            } else if (ctx.cte().CTE_FLOAT() != null) {
+                String floatValue = ctx.cte().CTE_FLOAT().getText();
+                stackContext.pushOperand(floatValue, VarType.FLOAT);
+                if (!constTable.hasConstant(floatValue)) {
+                    constTable.addConstant(floatValue, VarType.FLOAT);
+                }
+                return floatValue;
+            }
 
-        // 4. Crear GOTO al final del if/else
-        int gotoEndIndex = quadruples.size();
-        quadruples.add(new Quadruple("GOTO", "", "", "#-1", dirFunc, constTable));  // marcador temporal
+        } else if (ctx.expresion() != null) {
+            // Subexpresión entre paréntesis
+            return visit(ctx.expresion());
+        }
 
-        // 5. Rellenar el salto del GOTOF (posición del else)
-        int elseStart = quadruples.size();
-        Quadruple gotof = quadruples.get(gotofIndex);
-        quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + elseStart, dirFunc, constTable));
-
-        // 6. Visitar body falso (else)
-        visit(ctx.body(1));
-
-        // 7. Rellenar el salto del GOTO al final
-        int end = quadruples.size();
-        Quadruple gotoEnd = quadruples.get(gotoEndIndex);
-        quadruples.set(gotoEndIndex, new Quadruple("GOTO", "", "", "#" + end, dirFunc, constTable));
-
-        return null;
-    }
-
-    @Override
-    public String visitCycle(WebbyParser.CycleContext ctx) {
-        // 1. Guardar el inicio del ciclo
-        int loopStart = quadruples.size();
-
-        // 2. Evaluar condición
-        String conditionResult = visit(ctx.expresion());
-
-        // 3. Crear GOTOF con salto pendiente
-        int gotofIndex = quadruples.size();
-        quadruples.add(new Quadruple("GOTOF", conditionResult, "", "#-1", dirFunc, constTable)); // marcador temporal
-
-        // 4. Visitar el cuerpo del ciclo
-        visit(ctx.body());
-
-        // 5. Agregar GOTO para regresar al inicio del ciclo
-        quadruples.add(new Quadruple("GOTO", "", "", "#" + loopStart, dirFunc, constTable)); // salto al inicio del ciclo
-
-        // 6. Rellenar el salto del GOTOF con la posición actual
-        int end = quadruples.size();
-        Quadruple gotof = quadruples.get(gotofIndex);
-        quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + end, dirFunc, constTable));
-
-        return null;
+        return null; // No debería llegar aquí
     }
 
     @Override

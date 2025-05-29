@@ -35,7 +35,7 @@ public class MemoryManager {
     private int constStringCounter = 0;
 
     // Global
-    public int assignGlobalAddress(String varName, VarType type) {
+    public int assignGlobalAddress(VarType type) {
         return switch (type) {
             case INT -> GLOBAL_INT_BASE + globalIntCounter++;
             case FLOAT -> GLOBAL_FLOAT_BASE + globalFloatCounter++;
