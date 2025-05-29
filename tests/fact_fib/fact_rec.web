@@ -1,0 +1,22 @@
+program factorialFunc;
+
+var
+    n : int;
+
+void factorial(n : int, result : int) [
+{
+    if (n > 1) {
+        print(result);
+        factorial(n - 1, result * n);
+    } else {
+        print("Factorial desde función:", result);
+    };
+}
+];
+
+main {
+    n = 5;
+    factorial(n, 1);
+}
+
+end

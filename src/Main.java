@@ -57,10 +57,13 @@ public class Main {
                 ParseTree tree = parser.programa();
 
                 // Imprimir árbol de sintaxis
-                System.out.println(tree.toStringTree(parser));
+                // System.out.println(tree.toStringTree(parser));
                 
                 if (isValid[0]) System.out.println("✓ Sintaxis correcta.\n");
-                else System.out.println("✗ Sintaxis incorrecta.\n");
+                else {
+                    System.out.println("✗ Sintaxis incorrecta.\n");
+                    return;
+                }
 
                 // Aquí es donde entra la semántica
                 // Utilizamos un visitante para recorrer el árbol y realizar la validación semántica
