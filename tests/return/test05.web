@@ -1,0 +1,15 @@
+program testCuadrado;
+
+var x: int;
+
+int cuadrado(n: int) [
+  {
+    return n * n;
+  }
+];
+
+main {
+  x = cuadrado(2);
+  print(x);
+}
+end

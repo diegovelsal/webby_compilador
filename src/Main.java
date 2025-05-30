@@ -57,7 +57,7 @@ public class Main {
                 ParseTree tree = parser.programa();
 
                 // Imprimir árbol de sintaxis
-                //System.out.println(tree.toStringTree(parser));
+                // System.out.println(tree.toStringTree(parser));
                 
                 if (isValid[0]) System.out.println("Sintaxis correcta.\n");
                 else {
@@ -72,17 +72,17 @@ public class Main {
 
                 List<Quadruple> quadruples = semanticVisitor.getQuadruples();
 
-                System.out.println("Cuádruplos generados:");
-                for (Quadruple quad : quadruples) {
-                    System.out.println(quad);
-                }
-                System.out.println();
+                // System.out.println("Cuádruplos generados:");
+                // for (Quadruple quad : quadruples) {
+                //     System.out.println(quad);
+                // }
+                // System.out.println();
                 
-                System.out.println("Cuádruplos usando memoria:");
-                for (Quadruple quad : quadruples) {
-                    System.out.println(quad.toMemoryString());
-                }
-                System.out.println();
+                // System.out.println("Cuádruplos usando memoria:");
+                // for (Quadruple quad : quadruples) {
+                //     System.out.println(quad.toMemoryString());
+                // }
+                // System.out.println();
 
                 DirFunc dirFunc = semanticVisitor.getDirFunc();
                 ConstTable constTable = semanticVisitor.getConstTable();

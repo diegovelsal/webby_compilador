@@ -1,0 +1,23 @@
+program fibonacciFunc;
+
+var
+    n : int;
+
+int fibonacci(n : int) [
+{
+    if (n < 2) {
+        return 1;
+    } else {
+        return fibonacci(n-1) + fibonacci(n-2);
+    };
+
+    return 0;
+}
+];
+
+main {
+    n = 5;
+    print(fibonacci(n));
+}
+
+end
