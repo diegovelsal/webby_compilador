@@ -1,0 +1,25 @@
+program factorialFunc;
+
+var
+    n : int;
+    res : int;
+
+int factorial(n : int) [
+{
+    if (n > 1) {
+        return n * factorial(n - 1);
+    } else {
+        return 1;
+    };
+
+    return 0;
+}
+];
+
+main {
+    n = 5;
+    res = factorial(n);
+    print("Factorial desde función: ", res);
+}
+
+end

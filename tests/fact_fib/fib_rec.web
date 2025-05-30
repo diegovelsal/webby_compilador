@@ -6,16 +6,16 @@ var
 void fibonacci(n : int, a : int, b : int, i : int) [
 {
     if (i < n) {
-        print(a);
+        print("Número ", i, ": ", a);
         fibonacci(n, b, a + b, i + 1);
     } else {
-        print("Resultado final: ", a);
+        print("Número ", i, " final: ", a);
     };
 }
 ];
 
 main {
-    n = 6;
+    n = 10;
     fibonacci(n, 0, 1, 1);
 }
 
