@@ -77,6 +77,12 @@ public interface WebbyParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReturn(WebbyParser.ReturnContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link WebbyParser#assign_stmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssign_stmt(WebbyParser.Assign_stmtContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link WebbyParser#assign}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -113,6 +119,12 @@ public interface WebbyParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCycle(WebbyParser.CycleContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link WebbyParser#for}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFor(WebbyParser.ForContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link WebbyParser#expresion}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -142,6 +154,12 @@ public interface WebbyParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCte(WebbyParser.CteContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WebbyParser#f_call_stmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitF_call_stmt(WebbyParser.F_call_stmtContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link WebbyParser#f_call}.
 	 * @param ctx the parse tree

@@ -42,20 +42,25 @@ body
     ;
 
 statement
-    : assign
+    : assign_stmt
     | condition
     | cycle
-    | f_call
+    | f_call_stmt
     | print
     | return
+    | for
     ;
 
 return
     : RETURN (expresion)? SEMICOLON
     ;
 
+assign_stmt
+    : assign SEMICOLON
+    ;
+
 assign
-    : ID ASSIGN expresion SEMICOLON
+    : ID ASSIGN expresion
     ;
 
 print
@@ -79,6 +84,10 @@ cycle
     : WHILE LPAREN expresion RPAREN DO body SEMICOLON
     ;
 
+for
+    : FOR LPAREN assign SEMICOLON expresion SEMICOLON assign RPAREN body SEMICOLON
+    ;
+
 expresion
     : exp ( (LESS | GREATER | NOTEQUAL) exp )*
     ;
@@ -98,6 +107,10 @@ factor
 cte
     : CTE_INT
     | CTE_FLOAT
+    ;
+
+f_call_stmt
+    : f_call SEMICOLON
     ;
 
 f_call

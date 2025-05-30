@@ -272,6 +272,44 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     }
 
     @Override
+    public String visitFor(WebbyParser.ForContext ctx) {
+        controlStructureDepth++;
+
+        // 1. Ejecutar la asignación inicial (e.g., i = 0)
+        visit(ctx.assign(0));
+
+        // 2. Guardar el inicio del ciclo para volver después de la actualización
+        int loopStart = quadruples.size();
+
+        // 3. Evaluar la condición booleana (e.g., i < 10)
+        String conditionResult = visit(ctx.expresion());
+
+        // 5. Agregar cuádruplo GOTOF con salto pendiente
+        int gotofIndex = quadruples.size();
+        quadruples.add(new Quadruple("GOTOF", conditionResult, "", "#-1", dirFunc, constTable));
+
+        // 6. Visitar el cuerpo del ciclo
+        visit(ctx.body());
+
+        // 7. Ejecutar la asignación de actualización (e.g., i = i + 1)
+        visit(ctx.assign(1));
+
+        // 8. Agregar GOTO que regrese al inicio del ciclo
+        quadruples.add(new Quadruple("GOTO", "", "", "#" + loopStart, dirFunc, constTable));
+
+        // 9. Actualizar el salto del GOTOF con la posición de salida
+        int end = quadruples.size();
+        Quadruple gotof = quadruples.get(gotofIndex);
+        quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + end, dirFunc, constTable));
+
+        controlStructureDepth--;
+
+        return null;
+    }
+
+
+
+    @Override
     public String visitReturn(WebbyParser.ReturnContext ctx) {
         String funcName = dirFunc.getCurrentFunction();
         VarType returnType = dirFunc.getFunctionReturnType(funcName);
@@ -527,6 +565,16 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         // Si es positivo o no hay signo unario, simplemente push
         stackContext.pushOperand(value, varType);
         return value;
+    }
+
+    @Override
+    public String visitAssign_stmt(WebbyParser.Assign_stmtContext ctx) {
+        return visit(ctx.assign());
+    }
+
+    @Override
+    public String visitF_call_stmt(WebbyParser.F_call_stmtContext ctx) {
+        return visit(ctx.f_call());
     }
 
 

@@ -149,6 +149,18 @@ public class WebbyParserBaseListener implements WebbyParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAssign_stmt(WebbyParser.Assign_stmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAssign_stmt(WebbyParser.Assign_stmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAssign(WebbyParser.AssignContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -221,6 +233,18 @@ public class WebbyParserBaseListener implements WebbyParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFor(WebbyParser.ForContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFor(WebbyParser.ForContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterExpresion(WebbyParser.ExpresionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -276,6 +300,18 @@ public class WebbyParserBaseListener implements WebbyParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCte(WebbyParser.CteContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterF_call_stmt(WebbyParser.F_call_stmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitF_call_stmt(WebbyParser.F_call_stmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

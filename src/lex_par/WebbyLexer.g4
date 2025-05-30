@@ -14,6 +14,7 @@ VOID    : 'void';
 INT     : 'int';
 FLOAT   : 'float';
 RETURN  : 'return';
+FOR     : 'for';
 
 // Identificadores y Constantes
 ID        : [a-zA-Z_][a-zA-Z0-9_]*;

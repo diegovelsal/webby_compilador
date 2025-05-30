@@ -118,6 +118,16 @@ public interface WebbyParserListener extends ParseTreeListener {
 	 */
 	void exitReturn(WebbyParser.ReturnContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link WebbyParser#assign_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssign_stmt(WebbyParser.Assign_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WebbyParser#assign_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssign_stmt(WebbyParser.Assign_stmtContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link WebbyParser#assign}.
 	 * @param ctx the parse tree
 	 */
@@ -178,6 +188,16 @@ public interface WebbyParserListener extends ParseTreeListener {
 	 */
 	void exitCycle(WebbyParser.CycleContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link WebbyParser#for}.
+	 * @param ctx the parse tree
+	 */
+	void enterFor(WebbyParser.ForContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WebbyParser#for}.
+	 * @param ctx the parse tree
+	 */
+	void exitFor(WebbyParser.ForContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link WebbyParser#expresion}.
 	 * @param ctx the parse tree
 	 */
@@ -227,6 +247,16 @@ public interface WebbyParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCte(WebbyParser.CteContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link WebbyParser#f_call_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterF_call_stmt(WebbyParser.F_call_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WebbyParser#f_call_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitF_call_stmt(WebbyParser.F_call_stmtContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link WebbyParser#f_call}.
 	 * @param ctx the parse tree
