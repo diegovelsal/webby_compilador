@@ -22,6 +22,10 @@ public class VirtualMemory {
     private final Deque<MemoryFrame> memoryFrames = new ArrayDeque<>();
     private MemoryFrame pendingFrame = null;
 
+    public int getMemoryFramesSize() {
+        return memoryFrames.size();
+    }
+
     public void pushFrame(MemoryFrame mf) {
         memoryFrames.push(mf);
     }

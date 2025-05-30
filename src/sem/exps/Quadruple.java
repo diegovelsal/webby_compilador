@@ -25,13 +25,15 @@ public class Quadruple {
         Map.entry("<", 7),
         Map.entry(">", 8),
         Map.entry("PRINT", 9),
-        Map.entry("GOTO", 10),
-        Map.entry("GOTOF", 11),
-        Map.entry("ERA", 12),
-        Map.entry("PARAM", 13),
-        Map.entry("GOSUB", 14),
-        Map.entry("ENDFUNC", 15),
-        Map.entry("ENDPROG", 16)
+        Map.entry("PRINTLN", 10),
+        Map.entry("GOTO", 11),
+        Map.entry("GOTOF", 12),
+        Map.entry("ERA", 13),
+        Map.entry("PARAM", 14),
+        Map.entry("GOSUB", 15),
+        Map.entry("RETURN", 16),
+        Map.entry("ENDFUNC", 17),
+        Map.entry("ENDPROG", 18)
     );
 
     public Quadruple(String operator, String leftOperand, String rightOperand, String result, DirFunc dirFunc, ConstTable constTable) {

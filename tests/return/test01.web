@@ -1,0 +1,16 @@
+program testFuncs;
+var a: int;
+
+int suma(a: int, b: int) [ 
+  var res: int;
+  {
+    res = a + b;
+    return res;
+  }
+];
+
+main {
+  a = 3;
+  print(suma(a, 2) + 5);
+}
+end

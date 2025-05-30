@@ -34,7 +34,7 @@ funcs_list
     ;
 
 funcs
-    : VOID ID LPAREN (params)? RPAREN LBRACK (vars)? body RBRACK SEMICOLON
+    : (type | VOID) ID LPAREN (params)? RPAREN LBRACK (vars)? body RBRACK SEMICOLON
     ;
 
 body
@@ -47,6 +47,11 @@ statement
     | cycle
     | f_call
     | print
+    | return
+    ;
+
+return
+    : RETURN (expresion)? SEMICOLON
     ;
 
 assign
@@ -87,7 +92,7 @@ termino
     ;
 
 factor
-    : (ADD | SUB)? (ID | cte | LPAREN expresion RPAREN)
+    : (ADD | SUB)? (ID | cte | f_call | LPAREN expresion RPAREN)
     ;
 
 cte
@@ -96,7 +101,7 @@ cte
     ;
 
 f_call
-    : ID LPAREN args? RPAREN SEMICOLON
+    : ID LPAREN args? RPAREN
     ;
 
 args

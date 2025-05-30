@@ -47,7 +47,7 @@ public class Main {
                     @Override
                     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, 
                             int line, int charPositionInLine, String msg, RecognitionException e) {
-                        System.err.println("✗ Error de sintaxis en " + file.getName() + " en la línea " + line + ", columna " 
+                        System.err.println("Error de sintaxis en " + file.getName() + " en la línea " + line + ", columna " 
                                 + charPositionInLine + ": " + msg);
                         isValid[0] = false;
                     }
@@ -57,12 +57,12 @@ public class Main {
                 ParseTree tree = parser.programa();
 
                 // Imprimir árbol de sintaxis
-                // System.out.println(tree.toStringTree(parser));
+                //System.out.println(tree.toStringTree(parser));
                 
-                if (isValid[0]) System.out.println("✓ Sintaxis correcta.\n");
+                if (isValid[0]) System.out.println("Sintaxis correcta.\n");
                 else {
-                    System.out.println("✗ Sintaxis incorrecta.\n");
-                    return;
+                    System.out.println("Sintaxis incorrecta.\n");
+                    continue;
                 }
 
                 // Aquí es donde entra la semántica

@@ -35,6 +35,7 @@ public class VirtualMachine {
             int leftAddr = quad.getLeftAddress();
             int rightAddr = quad.getRightAddress();
             int resAddr = quad.getResultAddress();
+            String left = quad.getLeftOperand();
             String res = quad.getResult();
 
             switch (opCode) {
@@ -51,8 +52,17 @@ public class VirtualMachine {
                     executeArithmetic(leftAddr, rightAddr, resAddr, "/");
                     break;
                 case 5: // =
-                    memory.setValue(resAddr, memory.getValue(leftAddr));
+                    if (leftAddr == 0) {
+                        // Asignación del valor retornado por una función
+                        int returnAddr = dirFunc.getReturnAddress(left);
+                        Object returnValue = memory.getValue(returnAddr);
+                        memory.popFrame();
+                        memory.setValue(resAddr, returnValue);
+                    } else {
+                        memory.setValue(resAddr, memory.getValue(leftAddr));
+                    }
                     break;
+
                 case 6: // !=
                     memory.setValue(resAddr, !memory.getValue(leftAddr).equals(memory.getValue(rightAddr)));
                     break;
@@ -63,43 +73,52 @@ public class VirtualMachine {
                     memory.setValue(resAddr, compareValues(memory.getValue(leftAddr), memory.getValue(rightAddr)) > 0);
                     break;
                 case 9: // PRINT
+                    System.out.print(memory.getValue(resAddr));
+                    break;
+                case 10: // PRINTLN
                     System.out.println(memory.getValue(resAddr));
                     break;
-                case 10: // GOTO
+                case 11: // GOTO
                     instructionPointer = resAddr;
                     continue;
-                case 11: // GOTOF
+                case 12: // GOTOF
                     Boolean condition = (Boolean) memory.getValue(leftAddr);
                     if (!condition) {
                         instructionPointer = resAddr;
                         continue;
                     }
                     break;
-                case 12: // ERA
+                case 13: // ERA
                     currentFunctionName = res;  // nombre de la función objetivo
                     paramCounter = 0;
                     memory.loadLocalTempVariables(dirFunc.getVarTable(res).getVariables());
                     break;
 
-                case 13: // PARAM
+                case 14: // PARAM
                     Object paramVal = memory.getValue(leftAddr);
                     int paramAddr = dirFunc.getParameterAddress(currentFunctionName, paramCounter);
                     memory.getPendingFrame().setValue(paramAddr, paramVal);
                     paramCounter++;
                     break;
 
-
-                case 14: // GOSUB
+                case 15: // GOSUB
                     callStack.push(instructionPointer + 1);
                     memory.commitPendingFrame(); // ahora sí lo hace activo
                     instructionPointer = resAddr;
                     continue;
 
-                case 15: // ENDFUNC
+                case 16: // RETURN
+                    Object returnValue = memory.getValue(resAddr);
+                    int returnAddr = dirFunc.getReturnAddress(currentFunctionName);
+                    memory.setValue(returnAddr, returnValue);
+                    instructionPointer = callStack.pop();
+                    continue;
+                    
+                case 17: // ENDFUNC
                     memory.popFrame();
                     instructionPointer = callStack.pop();
                     continue;
-                case 16: // ENDPROG
+                case 18: // ENDPROG
                     return;
                 // Agrega otros casos según necesites
                 default:
