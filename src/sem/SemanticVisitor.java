@@ -26,6 +26,9 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     private ConstTable constTable = new ConstTable(memoria);
     private LinkedList<String> argumentQueue = new LinkedList<>();
     private LinkedList<VarType> argumentTypeQueue = new LinkedList<>();
+    private int controlStructureDepth = 0;
+    private boolean hasUnconditionalReturn = false;
+
 
     private String generateTemp() {
         return "t" + (tempCounter++);
@@ -77,16 +80,33 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
 
     @Override
     public String visitFuncs(WebbyParser.FuncsContext ctx) {
+        VarType returnType;
+        if (ctx.type() != null) {
+            String typeStr = ctx.type().getText();
+            returnType = VarType.valueOf(typeStr.toUpperCase());
+        } else {
+            returnType = VarType.VOID;
+        }
+
         String funcName = ctx.ID().getText();
 
         // 1. Registrar la función
-        if (!dirFunc.addFunction(funcName)) {
+        if (!dirFunc.addFunction(funcName, returnType)) {
             throw new RuntimeException("Error: Función '" + funcName + "' ya fue declarada.");
         }
 
         // 2. Cambiar la función al current
         dirFunc.setCurrentFunction(funcName);
         dirFunc.setFunctionStartQuad(funcName, quadruples.size());
+
+        // Reservar dirección para valor de retorno si no es VOID
+        if (returnType != VarType.VOID) {
+            int retAddr = memoria.assignTempAddress(returnType);
+            dirFunc.setReturnAddress(funcName, retAddr);
+            dirFunc.addVariable("__return", returnType, retAddr);
+        }
+
+        hasUnconditionalReturn = false;
 
         // 3. Registrar parámetros si existen
         if (ctx.params() != null) {
@@ -101,6 +121,10 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         // 5. Visitar el cuerpo
         visit(ctx.body());
 
+        if (returnType != VarType.VOID && !hasUnconditionalReturn) {
+            throw new RuntimeException("Error: La función '" + funcName + "' debe tener al menos un 'return' no condicionado.");
+        }
+
         // 6. Limpiar memoria local y temporales
         memoria.resetLocalAndTemp();
 
@@ -114,7 +138,7 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     public String visitVars(WebbyParser.VarsContext ctx) {
         for (WebbyParser.Var_declContext varDecl : ctx.var_decl()) {
             String typeStr = varDecl.type().getText();
-            VarType varType = VarType.valueOf(typeStr.toUpperCase()); // INT -> VarType.INT
+            VarType varType = VarType.valueOf(typeStr.toUpperCase());
 
             for (TerminalNode idToken : varDecl.id_list().ID()) {
                 String id = idToken.getText();
@@ -156,6 +180,19 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     }
 
     @Override
+    public String visitPrint_args(WebbyParser.Print_argsContext ctx) {
+        int n = ctx.print_arg().size();
+
+        for (int i = 0; i < n; i++) {
+            String val = visit(ctx.print_arg(i));
+            String op = (i == n - 1) ? "PRINTLN" : "PRINT";
+            quadruples.add(new Quadruple(op, "", "", val, dirFunc, constTable));
+        }
+
+        return null;
+    }
+
+    @Override
     public String visitPrint_arg(WebbyParser.Print_argContext ctx) {
         if (ctx.CTE_STRING() != null) {
             String str = ctx.CTE_STRING().getText().replace("\"", ""); // Eliminar comillas
@@ -165,10 +202,9 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
                 constTable.addConstant(str, VarType.STRING);
             }
 
-            quadruples.add(new Quadruple("PRINT", "", "", str, dirFunc, constTable));
+            return str;
         } else if (ctx.expresion() != null) {
-            String result = visit(ctx.expresion());
-            quadruples.add(new Quadruple("PRINT", "", "", result, dirFunc, constTable));
+            return visit(ctx.expresion());
         }
 
         return null;
@@ -177,6 +213,7 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
     @Override
     public String visitCondition(WebbyParser.ConditionContext ctx) {
         // 1. Visitar la expresión y obtener resultado de la condición
+        controlStructureDepth++;
         String conditionResult = visit(ctx.expresion());
 
         // 2. Crear GOTOF con salto pendiente
@@ -201,11 +238,13 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         int end = quadruples.size();
         quadruples.set(gotoEndIndex, new Quadruple("GOTO", "", "", "#" + end, dirFunc, constTable));
 
+        controlStructureDepth--;
         return null;
     }
 
     @Override
     public String visitCycle(WebbyParser.CycleContext ctx) {
+        controlStructureDepth++;
         // 1. Guardar el inicio del ciclo
         int loopStart = quadruples.size();
 
@@ -226,6 +265,49 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         int end = quadruples.size();
         Quadruple gotof = quadruples.get(gotofIndex);
         quadruples.set(gotofIndex, new Quadruple("GOTOF", conditionResult, "", "#" + end, dirFunc, constTable));
+
+        controlStructureDepth--;
+
+        return null;
+    }
+
+    @Override
+    public String visitReturn(WebbyParser.ReturnContext ctx) {
+        String funcName = dirFunc.getCurrentFunction();
+        VarType returnType = dirFunc.getFunctionReturnType(funcName);
+
+        if (controlStructureDepth == 0) {
+            hasUnconditionalReturn = true;
+        }
+
+        if (ctx.expresion() == null) {
+            if (returnType != VarType.VOID) {
+                throw new RuntimeException("Error: La función '" + funcName + "' debe retornar un valor de tipo " + returnType);
+            }
+
+            // Cuádruplo de RETURN sin valor para funciones void
+            quadruples.add(new Quadruple("RETURN", "", "", "", dirFunc, constTable));
+        } else {
+            if (returnType == VarType.VOID) {
+                throw new RuntimeException("Error: La función void '" + funcName + "' no debe retornar un valor.");
+            }
+
+            // Visitar la expresión (esto hace pushOperand y pushType)
+            visit(ctx.expresion());
+
+            // Sacar tipo y dirección de la expresión
+            VarType exprType = stackContext.popType();
+            String exprValue = stackContext.popOperand();
+
+            // Validar tipo de retorno
+            VarType resultType = cuboSemantico.getResultType("=", returnType, exprType);
+            if (resultType == null) {
+                throw new RuntimeException("Error: Tipo de retorno inválido. Se esperaba " + returnType + ", pero se obtuvo " + exprType);
+            }
+
+            // Generar cuádruplo de RETURN con el valor
+            quadruples.add(new Quadruple("RETURN", "", "", exprValue, dirFunc, constTable));
+        }
 
         return null;
     }
@@ -392,40 +474,61 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
 
     @Override
     public String visitFactor(WebbyParser.FactorContext ctx) {
+        boolean isNegative = ctx.SUB() != null;
+        boolean isPositive = ctx.ADD() != null;
+
+        String value = null;
+        VarType varType = null;
+
         if (ctx.ID() != null) {
             String id = ctx.ID().getText();
             if (!dirFunc.variableExists(id)) {
                 throw new RuntimeException("Error: Variable '" + id + "' usada sin ser declarada.");
             }
 
-            VarType varType = dirFunc.getVariableType(id);
-            stackContext.pushOperand(id, varType);
-            return id;
+            varType = dirFunc.getVariableType(id);
+            value = id;
 
         } else if (ctx.cte() != null) {
             if (ctx.cte().CTE_INT() != null) {
-                String intValue = ctx.cte().CTE_INT().getText();
-                stackContext.pushOperand(intValue, VarType.INT);
-                if (!constTable.hasConstant(intValue)) {
-                    constTable.addConstant(intValue, VarType.INT);
-                }
-                return intValue;
+                value = ctx.cte().CTE_INT().getText();
+                varType = VarType.INT;
             } else if (ctx.cte().CTE_FLOAT() != null) {
-                String floatValue = ctx.cte().CTE_FLOAT().getText();
-                stackContext.pushOperand(floatValue, VarType.FLOAT);
-                if (!constTable.hasConstant(floatValue)) {
-                    constTable.addConstant(floatValue, VarType.FLOAT);
-                }
-                return floatValue;
+                value = ctx.cte().CTE_FLOAT().getText();
+                varType = VarType.FLOAT;
             }
 
+            if (value != null && !constTable.hasConstant(value)) {
+                constTable.addConstant(value, varType);
+            }
+
+        } else if (ctx.f_call() != null) {
+            return visit(ctx.f_call());
         } else if (ctx.expresion() != null) {
-            // Subexpresión entre paréntesis
             return visit(ctx.expresion());
         }
 
-        return null; // No debería llegar aquí
+        if (value == null || varType == null) {
+            throw new RuntimeException("Error al procesar factor.");
+        }
+
+        if (isNegative) {
+            String tempName = generateTemp(); // p.ej. t1, t2, etc.
+            int tempAddress = memoria.assignTempAddress(varType); // asignar dirección temporal
+            dirFunc.addVariable(tempName, varType, tempAddress);
+
+            // Crear cuádruplo de resta unaria (0 - value)
+            quadruples.add(new Quadruple("-", "0", value, tempName, dirFunc, constTable));
+
+            stackContext.pushOperand(tempName, varType);
+            return tempName;
+        }
+
+        // Si es positivo o no hay signo unario, simplemente push
+        stackContext.pushOperand(value, varType);
+        return value;
     }
+
 
     @Override
     public String visitF_call(WebbyParser.F_callContext ctx) {
@@ -471,6 +574,26 @@ public class SemanticVisitor extends WebbyParserBaseVisitor<String> {
         int startQuad = dirFunc.getFunctionStartQuad(funcName);
         quadruples.add(new Quadruple("GOSUB", "", "", "#" + startQuad, dirFunc, constTable));
 
+        // 8. Manejar el retorno de la función
+        VarType returnType = dirFunc.getFunctionReturnType(funcName);
+        if (returnType != VarType.VOID) {
+            // 1. Generar un nombre único para el temporal
+            String tempName = generateTemp(); // por ejemplo "t1", "t2", etc.
+
+            // 2. Obtener dirección temporal desde la clase Memoria
+            int tempAddress = memoria.assignTempAddress(returnType);  // entrega dirección disponible y la incrementa
+
+            // 3. Registrar temporal en la función actual
+            dirFunc.addVariable(tempName, returnType, tempAddress);
+
+            // 4. Generar cuádruplo de asignación del retorno a este temporal
+            quadruples.add(new Quadruple("=", funcName, "", tempName, dirFunc, constTable));
+
+            // 5. Apilar el resultado en operandStack y typeStack para que sea usado en expresiones
+            stackContext.pushOperand(tempName, returnType);
+
+            return tempName;
+        }
         return null;
     }
 

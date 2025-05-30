@@ -1,0 +1,16 @@
+program testFuncsComplex;
+var x, y: int;
+
+int cuadrado(n: int) [
+  var res: int;
+  {
+    res = n * n;
+  }
+];
+
+main {
+  x = 3;
+  y = 4;
+  print("Resultado:");
+}
+end

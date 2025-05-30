@@ -92,7 +92,7 @@ termino
     ;
 
 factor
-    : (ADD | SUB)? (ID | cte | LPAREN expresion RPAREN)
+    : (ADD | SUB)? (ID | cte | f_call | LPAREN expresion RPAREN)
     ;
 
 cte
@@ -101,7 +101,7 @@ cte
     ;
 
 f_call
-    : ID LPAREN args? RPAREN SEMICOLON
+    : ID LPAREN args? RPAREN
     ;
 
 args

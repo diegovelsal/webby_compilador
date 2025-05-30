@@ -1,0 +1,25 @@
+program testFuncsComplex;
+var x, y: int;
+
+int cuadrado(n: int) [
+  var res: int;
+  {
+    res = n * n;
+    return res;
+  }
+];
+
+int sumaCuadrados(a: int, b: int) [
+  var total: int;
+  {
+    total = cuadrado(a) + cuadrado(b);
+    return total;
+  }
+];
+
+main {
+  x = 3;
+  y = 4;
+  print("Resultado: ", sumaCuadrados(x, y) + cuadrado(2));
+}
+end

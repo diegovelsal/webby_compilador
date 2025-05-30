@@ -31,11 +31,18 @@ public class DirFunc {
     public class FunctionInfo {
         private final VarTable varTable;
         private final List<Parameter> parameters;
+        private int returnAddress = -1;
+        private VarType returnType;
         private int startQuad;
 
-        public FunctionInfo() {
+        public FunctionInfo(VarType returnType) {
+            this.returnType = returnType;
             this.varTable = new VarTable();
             this.parameters = new ArrayList<>();
+        }
+
+        public VarType getReturnType() {
+            return returnType;
         }
 
         public VarTable getVarTable() {
@@ -58,6 +65,14 @@ public class DirFunc {
         public int getStartQuad() {
             return startQuad;
         }
+
+        public int getReturnAddress() {
+            return returnAddress;
+        }
+
+        public void setReturnAddress(int address) {
+            this.returnAddress = address;
+        }
     }
 
     private final HashMap<String, FunctionInfo> functions;
@@ -68,12 +83,12 @@ public class DirFunc {
         this.globalScopeName = programName;
         this.currentFunction = programName;
         this.functions = new HashMap<>();
-        this.functions.put(programName, new FunctionInfo()); // Scope global
+        this.functions.put(programName, new FunctionInfo(VarType.VOID)); // Scope global
     }
 
-    public boolean addFunction(String name) {
+    public boolean addFunction(String name, VarType returnType) {
         if (!functions.containsKey(name)) {
-            functions.put(name, new FunctionInfo());
+            functions.put(name, new FunctionInfo(returnType));
             return true;
         }
         return false;
@@ -120,6 +135,11 @@ public class DirFunc {
     public List<Parameter> getFunctionParameters(String funcName) {
         return functions.get(funcName).getParameters();
     }
+
+    public VarType getFunctionReturnType(String funcName) {
+        return functions.get(funcName).getReturnType();
+    }
+
 
     public void setFunctionStartQuad(String funcName, int quad) {
         functions.get(funcName).setStartQuad(quad);
@@ -171,4 +191,17 @@ public class DirFunc {
         return params.get(index).getAddress();
     }
 
+    public void setReturnAddress(String funcName, int address) {
+        if (!functions.containsKey(funcName)) {
+            throw new IllegalArgumentException("Función '" + funcName + "' no existe.");
+        }
+        functions.get(funcName).setReturnAddress(address);
+    }
+
+    public int getReturnAddress(String funcName) {
+        if (!functions.containsKey(funcName)) {
+            throw new IllegalArgumentException("Función '" + funcName + "' no existe.");
+        }
+        return functions.get(funcName).getReturnAddress();
+    }
 }

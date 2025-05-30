@@ -1,4 +1,4 @@
-// Generated from src/lex_par/WebbyParser.g4 by ANTLR 4.13.2
+// Generated from ./src/lex_par/WebbyParser.g4 by ANTLR 4.13.2
 package lex_par;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -70,6 +70,12 @@ public interface WebbyParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitStatement(WebbyParser.StatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WebbyParser#return}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitReturn(WebbyParser.ReturnContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link WebbyParser#assign}.
 	 * @param ctx the parse tree

@@ -1295,6 +1295,9 @@ public class WebbyParser extends Parser {
 		public CteContext cte() {
 			return getRuleContext(CteContext.class,0);
 		}
+		public F_callContext f_call() {
+			return getRuleContext(F_callContext.class,0);
+		}
 		public TerminalNode LPAREN() { return getToken(WebbyParser.LPAREN, 0); }
 		public ExpresionContext expresion() {
 			return getRuleContext(ExpresionContext.class,0);
@@ -1333,34 +1336,37 @@ public class WebbyParser extends Parser {
 				}
 			}
 
-			setState(213);
+			setState(214);
 			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case ID:
+			switch ( getInterpreter().adaptivePredict(_input,18,_ctx) ) {
+			case 1:
 				{
 				setState(207);
 				match(ID);
 				}
 				break;
-			case CTE_INT:
-			case CTE_FLOAT:
+			case 2:
 				{
 				setState(208);
 				cte();
 				}
 				break;
-			case LPAREN:
+			case 3:
 				{
 				setState(209);
-				match(LPAREN);
+				f_call();
+				}
+				break;
+			case 4:
+				{
 				setState(210);
-				expresion();
+				match(LPAREN);
 				setState(211);
+				expresion();
+				setState(212);
 				match(RPAREN);
 				}
 				break;
-			default:
-				throw new NoViableAltException(this);
 			}
 			}
 		}
@@ -1392,7 +1398,7 @@ public class WebbyParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(215);
+			setState(216);
 			_la = _input.LA(1);
 			if ( !(_la==CTE_INT || _la==CTE_FLOAT) ) {
 			_errHandler.recoverInline(this);
@@ -1420,7 +1426,6 @@ public class WebbyParser extends Parser {
 		public TerminalNode ID() { return getToken(WebbyParser.ID, 0); }
 		public TerminalNode LPAREN() { return getToken(WebbyParser.LPAREN, 0); }
 		public TerminalNode RPAREN() { return getToken(WebbyParser.RPAREN, 0); }
-		public TerminalNode SEMICOLON() { return getToken(WebbyParser.SEMICOLON, 0); }
 		public ArgsContext args() {
 			return getRuleContext(ArgsContext.class,0);
 		}
@@ -1437,24 +1442,22 @@ public class WebbyParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(217);
-			match(ID);
 			setState(218);
+			match(ID);
+			setState(219);
 			match(LPAREN);
-			setState(220);
+			setState(221);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & 68009984L) != 0)) {
 				{
-				setState(219);
+				setState(220);
 				args();
 				}
 			}
 
-			setState(222);
-			match(RPAREN);
 			setState(223);
-			match(SEMICOLON);
+			match(RPAREN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1557,14 +1560,14 @@ public class WebbyParser extends Parser {
 		"\u0012\n\u0012\f\u0012\u00c3\t\u0012\u0001\u0013\u0001\u0013\u0001\u0013"+
 		"\u0005\u0013\u00c8\b\u0013\n\u0013\f\u0013\u00cb\t\u0013\u0001\u0014\u0003"+
 		"\u0014\u00ce\b\u0014\u0001\u0014\u0001\u0014\u0001\u0014\u0001\u0014\u0001"+
-		"\u0014\u0001\u0014\u0003\u0014\u00d6\b\u0014\u0001\u0015\u0001\u0015\u0001"+
-		"\u0016\u0001\u0016\u0001\u0016\u0003\u0016\u00dd\b\u0016\u0001\u0016\u0001"+
+		"\u0014\u0001\u0014\u0001\u0014\u0003\u0014\u00d7\b\u0014\u0001\u0015\u0001"+
+		"\u0015\u0001\u0016\u0001\u0016\u0001\u0016\u0003\u0016\u00de\b\u0016\u0001"+
 		"\u0016\u0001\u0016\u0001\u0017\u0001\u0017\u0001\u0017\u0005\u0017\u00e5"+
 		"\b\u0017\n\u0017\f\u0017\u00e8\t\u0017\u0001\u0017\u0000\u0000\u0018\u0000"+
 		"\u0002\u0004\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016\u0018\u001a\u001c"+
 		"\u001e \"$&(*,.\u0000\u0005\u0001\u0000\u000b\f\u0001\u0000\u0017\u0019"+
 		"\u0001\u0000\u0012\u0013\u0001\u0000\u0014\u0015\u0001\u0000\u000f\u0010"+
-		"\u00eb\u00000\u0001\u0000\u0000\u0000\u0002=\u0001\u0000\u0000\u0000\u0004"+
+		"\u00ec\u00000\u0001\u0000\u0000\u0000\u0002=\u0001\u0000\u0000\u0000\u0004"+
 		"C\u0001\u0000\u0000\u0000\u0006H\u0001\u0000\u0000\u0000\bP\u0001\u0000"+
 		"\u0000\u0000\nR\u0001\u0000\u0000\u0000\f_\u0001\u0000\u0000\u0000\u000e"+
 		"e\u0001\u0000\u0000\u0000\u0010u\u0001\u0000\u0000\u0000\u0012\u0084\u0001"+
@@ -1573,7 +1576,7 @@ public class WebbyParser extends Parser {
 		"\u0000\u0000\u0000\u001c\u00a1\u0001\u0000\u0000\u0000\u001e\u00a3\u0001"+
 		"\u0000\u0000\u0000 \u00ac\u0001\u0000\u0000\u0000\"\u00b4\u0001\u0000"+
 		"\u0000\u0000$\u00bc\u0001\u0000\u0000\u0000&\u00c4\u0001\u0000\u0000\u0000"+
-		"(\u00cd\u0001\u0000\u0000\u0000*\u00d7\u0001\u0000\u0000\u0000,\u00d9"+
+		"(\u00cd\u0001\u0000\u0000\u0000*\u00d8\u0001\u0000\u0000\u0000,\u00da"+
 		"\u0001\u0000\u0000\u0000.\u00e1\u0001\u0000\u0000\u000001\u0005\u0001"+
 		"\u0000\u000012\u0005\u000e\u0000\u000024\u0005 \u0000\u000035\u0003\u0002"+
 		"\u0001\u000043\u0001\u0000\u0000\u000045\u0001\u0000\u0000\u000057\u0001"+
@@ -1649,23 +1652,24 @@ public class WebbyParser extends Parser {
 		"\u0000\u0000\u0000\u00c9\u00c7\u0001\u0000\u0000\u0000\u00c9\u00ca\u0001"+
 		"\u0000\u0000\u0000\u00ca\'\u0001\u0000\u0000\u0000\u00cb\u00c9\u0001\u0000"+
 		"\u0000\u0000\u00cc\u00ce\u0007\u0002\u0000\u0000\u00cd\u00cc\u0001\u0000"+
-		"\u0000\u0000\u00cd\u00ce\u0001\u0000\u0000\u0000\u00ce\u00d5\u0001\u0000"+
-		"\u0000\u0000\u00cf\u00d6\u0005\u000e\u0000\u0000\u00d0\u00d6\u0003*\u0015"+
-		"\u0000\u00d1\u00d2\u0005\u001a\u0000\u0000\u00d2\u00d3\u0003\"\u0011\u0000"+
-		"\u00d3\u00d4\u0005\u001b\u0000\u0000\u00d4\u00d6\u0001\u0000\u0000\u0000"+
-		"\u00d5\u00cf\u0001\u0000\u0000\u0000\u00d5\u00d0\u0001\u0000\u0000\u0000"+
-		"\u00d5\u00d1\u0001\u0000\u0000\u0000\u00d6)\u0001\u0000\u0000\u0000\u00d7"+
-		"\u00d8\u0007\u0004\u0000\u0000\u00d8+\u0001\u0000\u0000\u0000\u00d9\u00da"+
-		"\u0005\u000e\u0000\u0000\u00da\u00dc\u0005\u001a\u0000\u0000\u00db\u00dd"+
-		"\u0003.\u0017\u0000\u00dc\u00db\u0001\u0000\u0000\u0000\u00dc\u00dd\u0001"+
-		"\u0000\u0000\u0000\u00dd\u00de\u0001\u0000\u0000\u0000\u00de\u00df\u0005"+
-		"\u001b\u0000\u0000\u00df\u00e0\u0005 \u0000\u0000\u00e0-\u0001\u0000\u0000"+
-		"\u0000\u00e1\u00e6\u0003\"\u0011\u0000\u00e2\u00e3\u0005\"\u0000\u0000"+
-		"\u00e3\u00e5\u0003\"\u0011\u0000\u00e4\u00e2\u0001\u0000\u0000\u0000\u00e5"+
-		"\u00e8\u0001\u0000\u0000\u0000\u00e6\u00e4\u0001\u0000\u0000\u0000\u00e6"+
-		"\u00e7\u0001\u0000\u0000\u0000\u00e7/\u0001\u0000\u0000\u0000\u00e8\u00e6"+
-		"\u0001\u0000\u0000\u0000\u001547AM[aejoy\u0084\u0088\u009c\u00a1\u00b9"+
-		"\u00c1\u00c9\u00cd\u00d5\u00dc\u00e6";
+		"\u0000\u0000\u00cd\u00ce\u0001\u0000\u0000\u0000\u00ce\u00d6\u0001\u0000"+
+		"\u0000\u0000\u00cf\u00d7\u0005\u000e\u0000\u0000\u00d0\u00d7\u0003*\u0015"+
+		"\u0000\u00d1\u00d7\u0003,\u0016\u0000\u00d2\u00d3\u0005\u001a\u0000\u0000"+
+		"\u00d3\u00d4\u0003\"\u0011\u0000\u00d4\u00d5\u0005\u001b\u0000\u0000\u00d5"+
+		"\u00d7\u0001\u0000\u0000\u0000\u00d6\u00cf\u0001\u0000\u0000\u0000\u00d6"+
+		"\u00d0\u0001\u0000\u0000\u0000\u00d6\u00d1\u0001\u0000\u0000\u0000\u00d6"+
+		"\u00d2\u0001\u0000\u0000\u0000\u00d7)\u0001\u0000\u0000\u0000\u00d8\u00d9"+
+		"\u0007\u0004\u0000\u0000\u00d9+\u0001\u0000\u0000\u0000\u00da\u00db\u0005"+
+		"\u000e\u0000\u0000\u00db\u00dd\u0005\u001a\u0000\u0000\u00dc\u00de\u0003"+
+		".\u0017\u0000\u00dd\u00dc\u0001\u0000\u0000\u0000\u00dd\u00de\u0001\u0000"+
+		"\u0000\u0000\u00de\u00df\u0001\u0000\u0000\u0000\u00df\u00e0\u0005\u001b"+
+		"\u0000\u0000\u00e0-\u0001\u0000\u0000\u0000\u00e1\u00e6\u0003\"\u0011"+
+		"\u0000\u00e2\u00e3\u0005\"\u0000\u0000\u00e3\u00e5\u0003\"\u0011\u0000"+
+		"\u00e4\u00e2\u0001\u0000\u0000\u0000\u00e5\u00e8\u0001\u0000\u0000\u0000"+
+		"\u00e6\u00e4\u0001\u0000\u0000\u0000\u00e6\u00e7\u0001\u0000\u0000\u0000"+
+		"\u00e7/\u0001\u0000\u0000\u0000\u00e8\u00e6\u0001\u0000\u0000\u0000\u0015"+
+		"47AM[aejoy\u0084\u0088\u009c\u00a1\u00b9\u00c1\u00c9\u00cd\u00d6\u00dd"+
+		"\u00e6";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

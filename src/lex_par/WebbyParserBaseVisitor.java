@@ -1,4 +1,4 @@
-// Generated from src/lex_par/WebbyParser.g4 by ANTLR 4.13.2
+// Generated from ./src/lex_par/WebbyParser.g4 by ANTLR 4.13.2
 package lex_par;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -82,6 +82,13 @@ public class WebbyParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitStatement(WebbyParser.StatementContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitReturn(WebbyParser.ReturnContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
